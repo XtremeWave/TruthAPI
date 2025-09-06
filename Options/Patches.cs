@@ -1,0 +1,847 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AmongUs.GameOptions;
+using HarmonyLib;
+using TruthAPI.CustomRpc;
+using TruthAPI.Roles;
+using Reactor.Utilities;
+using Reactor.Utilities.Extensions;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using static UnityEngine.UI.Button;
+using Object = UnityEngine.Object;
+
+namespace TruthAPI.Options;
+
+public static class Patches
+{
+    [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
+    private class MoreTasks
+    {
+        public static void Postfix(GameOptionsMenu __instance)
+        {
+            if (__instance.gameObject.name == "GAME SETTINGS TAB")
+                try
+                {
+                    var commonTasks = __instance.Children.ToArray().FirstOrDefault(x =>
+                            x.TryCast<NumberOption>()?.intOptionName == Int32OptionNames.NumCommonTasks)
+                        .Cast<NumberOption>();
+                    if (commonTasks != null) commonTasks.ValidRange = new FloatRange(0f, 4f);
+
+                    var shortTasks = __instance.Children.ToArray()
+                        .FirstOrDefault(x => x.TryCast<NumberOption>()?.intOptionName == Int32OptionNames.NumShortTasks)
+                        .Cast<NumberOption>();
+                    if (shortTasks != null) shortTasks.ValidRange = new FloatRange(0f, 26f);
+
+                    var longTasks = __instance.Children.ToArray()
+                        .FirstOrDefault(x => x.TryCast<NumberOption>()?.intOptionName == Int32OptionNames.NumLongTasks)
+                        .Cast<NumberOption>();
+                    if (longTasks != null) longTasks.ValidRange = new FloatRange(0f, 15f);
+                }
+                catch
+                {
+                }
+        }
+    }
+
+    [HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.ChangeTab))]
+    private class ChangeTab
+    {
+        public static void Postfix(GameSettingMenu __instance, int tabNum, bool previewOnly)
+        {
+            if (SettingsUpdate.customRolesSettings != null)
+            {
+                SettingsUpdate.customRolesSettings.gameObject.Destroy();
+                SettingsUpdate.customRolesSettings = null;
+            }
+
+            if (previewOnly) return;
+            foreach (var tab in SettingsUpdate.Tabs)
+                if (tab != null)
+                    tab.SetActive(false);
+            foreach (var button in SettingsUpdate.Buttons) button.SelectButton(false);
+            if (tabNum > 2)
+            {
+                tabNum -= 3;
+                if (tabNum < SettingsUpdate.Tabs.Count && SettingsUpdate.Tabs[tabNum] != null) // Added null check
+                    SettingsUpdate.Tabs[tabNum].SetActive(true);
+
+                if (tabNum > 4) return;
+                if (tabNum < SettingsUpdate.Buttons.Count && SettingsUpdate.Buttons[tabNum] != null) // Added null check
+                    SettingsUpdate.Buttons[tabNum].SelectButton(true);
+
+                __instance.StartCoroutine(Effects.Lerp(1f, new Action<float>(p =>
+                {
+                    __instance.RoleSettingsTab.gameObject.SetActive(false);
+
+                    foreach (var option in CustomOption.AllOptions)
+                    {
+                        if (option?.Setting == null) continue; // Added null check
+
+                        if (option.Type == CustomOptionType.Number)
+                        {
+                            var number = option.Setting.TryCast<NumberOption>();
+                            if (number?.TitleText == null) continue; // Added null check
+                            number.TitleText.text = option.GetName();
+                            if (number.TitleText.text.StartsWith("<color="))
+                                number.TitleText.fontSize = 3f;
+                            else if (number.TitleText.text.Length > 20)
+                                number.TitleText.fontSize = 2.25f;
+                            else if (number.TitleText.text.Length > 40)
+                                number.TitleText.fontSize = 2f;
+                            else number.TitleText.fontSize = 2.75f;
+                        }
+                        else if (option.Type == CustomOptionType.Toggle)
+                        {
+                            var tgl = option.Setting.TryCast<ToggleOption>();
+                            if (tgl?.TitleText == null) continue; // Added null check
+                            tgl.TitleText.text = option.GetName();
+                            if (tgl.TitleText.text.Length > 20)
+                                tgl.TitleText.fontSize = 2.25f;
+                            else if (tgl.TitleText.text.Length > 40)
+                                tgl.TitleText.fontSize = 2f;
+                            else tgl.TitleText.fontSize = 2.75f;
+                        }
+                        else if (option.Type == CustomOptionType.String)
+                        {
+                            var str = option.Setting.TryCast<StringOption>();
+                            if (str?.TitleText == null) continue; // Added null check
+                            str.TitleText.text = option.GetName();
+                            if (str.TitleText.text.Length > 20)
+                                str.TitleText.fontSize = 2.25f;
+                            else if (str.TitleText.text.Length > 40)
+                                str.TitleText.fontSize = 2f;
+                            else str.TitleText.fontSize = 2.75f;
+                        }
+                    }
+                })));
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.Close))]
+    private class CloseSettings
+    {
+        public static void Prefix(GameSettingMenu __instance)
+        {
+            LobbyInfoPane.Instance.EditButton.gameObject.SetActive(true);
+        }
+    }
+
+    [HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.Start))]
+    internal class SettingsUpdate
+    {
+        public static List<PassiveButton> Buttons = new();
+        public static List<GameObject> Tabs = new();
+        public static bool firstStart = true;
+
+        public static void Postfix(GameSettingMenu __instance)
+        {
+            if (firstStart)
+            {
+                CustomOption.LoadSettings();
+                firstStart = false;
+            }
+
+            __instance.GameSettingsButton.OnMouseOver.RemoveAllListeners();
+            LobbyInfoPane.Instance.EditButton.gameObject.SetActive(false);
+            Buttons.ForEach(x => x?.Destroy());
+            Tabs.ForEach(x => x?.Destroy());
+            Buttons = new List<PassiveButton>();
+            Tabs = new List<GameObject>();
+
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
+
+            GameObject.Find("What Is This?")?.Destroy();
+            GameObject.Find("RoleSettingsButton")?.Destroy();
+            GameObject.Find("GamePresetButton")?.Destroy();
+            __instance.ChangeTab(1, false);
+
+            var settingsButton = GameObject.Find("GameSettingsButton");
+            settingsButton.transform.localPosition += new Vector3(0f, 2f, 0f);
+            settingsButton.transform.localScale *= 0.9f;
+
+            CreateSettings(__instance, 3, "ModSettings", "Mod Settings", settingsButton, MultiMenu.Main);
+            CreateSettings(__instance, 4, "CrewSettings", "Crewmate Settings", settingsButton, MultiMenu.Crewmate);
+            CreateSettings(__instance, 5, "NeutralSettings", "Neutral Settings", settingsButton, MultiMenu.Neutral);
+            CreateSettings(__instance, 6, "ImpSettings", "Impostor Settings", settingsButton, MultiMenu.Impostor);
+        }
+
+        internal static RolesSettingsMenu customRolesSettings = null;
+
+        public static void CreateSettings(GameSettingMenu __instance, int target, string name, string text, GameObject settingsButton, MultiMenu menu)
+        {
+            var panel = GameObject.Find("LeftPanel");
+            var button = GameObject.Find(name);
+            if (button == null)
+            {
+                button = GameObject.Instantiate(settingsButton, panel.transform);
+                button.transform.localPosition += new Vector3(0f, -0.55f * target + 1.1f, 0f);
+                button.name = name;
+                __instance.StartCoroutine(Effects.Lerp(1f,
+                    new Action<float>(p =>
+                    {
+                        button.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text =
+                            text;
+                    })));
+                var passiveButton = button.GetComponent<PassiveButton>();
+                passiveButton.OnClick.RemoveAllListeners();
+                passiveButton.OnClick.AddListener((Action)(() => { __instance.ChangeTab(target, false); }));
+                passiveButton.SelectButton(false);
+                Buttons.Add(passiveButton);
+            }
+
+            var settingsTab = GameObject.Find("GAME SETTINGS TAB");
+            Tabs.RemoveAll(x => x == null);
+            var tab = GameObject.Instantiate(settingsTab, settingsTab.transform.parent);
+            tab.name = name;
+            var tabOptions = tab.GetComponent<GameOptionsMenu>();
+            foreach (var child in tabOptions.Children) child.Destroy();
+            tabOptions.scrollBar.transform.FindChild("SliderInner").DestroyChildren();
+            tabOptions.Children.Clear();
+            var options = CustomOption.AllOptions.Where(x => x.Menu == menu).ToList();
+
+            var num = 1.5f;
+
+            if (target > 3)
+            {
+                var header = Object.Instantiate(tabOptions.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, tabOptions.settingsContainer);
+                header.SetHeader(StringNames.ImpostorsCategory, 20);
+                header.Title.text = DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.RoleQuotaLabel);
+                header.transform.localScale = Vector3.one * 0.65f;
+                header.transform.localPosition = new Vector3(-0.9f, num, -2f);
+                num -= 0.65f;
+
+                var roleHeader = Object.Instantiate(tabOptions.RolesMenu.categoryHeaderEditRoleOrigin, Vector3.zero, Quaternion.identity, tabOptions.settingsContainer);
+                roleHeader.SetHeader(target == 6 ? StringNames.ImpostorRolesHeader : StringNames.CrewmateRolesHeader, 20);
+                roleHeader.Title.text = target == 4 ? "Crewmate Roles" : target == 5 ? "Neutral Roles" : "Impostor Roles";
+                roleHeader.Background.color = target == 4 ? Palette.CrewmateBlue : target == 5 ? Color.gray : Palette.ImpostorRed;
+                roleHeader.transform.localPosition = new Vector3(4.75f, num + 0.2f, -2f);
+                num -= 0.61f;
+            }
+
+            foreach (var option in options)
+            {
+                if (option.IsRoleOption)
+                    continue;
+
+                if (option.Type == CustomOptionType.Header)
+                {
+                    var header = Object.Instantiate(tabOptions.categoryHeaderOrigin, Vector3.zero,
+                        Quaternion.identity, tabOptions.settingsContainer);
+                    header.SetHeader(StringNames.ImpostorsCategory, 20);
+                    header.Title.text = option.GetName();
+                    header.transform.localScale = Vector3.one * 0.65f;
+                    header.transform.localPosition = new Vector3(-0.9f, num, -2f);
+                    num -= 0.625f;
+                    continue;
+                }
+
+                if (option.Type == CustomOptionType.Number)
+                {
+                    OptionBehaviour optionBehaviour = Object.Instantiate(tabOptions.numberOptionOrigin,
+                        Vector3.zero, Quaternion.identity, tabOptions.settingsContainer);
+                    optionBehaviour.transform.localPosition = new Vector3(0.95f, num, -2f);
+                    optionBehaviour.SetClickMask(tabOptions.ButtonClickMask);
+                    SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                    for (var i = 0; i < components.Length; i++)
+                        components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+
+                    var numberOption = optionBehaviour as NumberOption;
+                    option.Setting = numberOption;
+
+                    tabOptions.Children.Add(optionBehaviour);
+                }
+
+                else if (option.Type == CustomOptionType.Role)
+                {
+                    OptionBehaviour optionBehaviour = Object.Instantiate(tabOptions.RolesMenu.roleOptionSettingOrigin,
+                        Vector3.zero, Quaternion.identity, tabOptions.settingsContainer);
+                    optionBehaviour.transform.localPosition = new Vector3(-0.39f, num + 0.26f, -2f);
+                    optionBehaviour.SetClickMask(tabOptions.ButtonClickMask);
+                    SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                    for (var i = 0; i < components.Length; i++)
+                        components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+
+                    var roleOptionSettingOption = optionBehaviour as RoleOptionSetting;
+                    roleOptionSettingOption.SetRole(GameOptionsManager.Instance.CurrentGameOptions.RoleOptions, option.BaseRole.RoleBehaviour, 20);
+                    roleOptionSettingOption.ChanceMinusBtn.isInteractable = true;
+                    roleOptionSettingOption.ChancePlusBtn.isInteractable = true;
+                    roleOptionSettingOption.CountMinusBtn.isInteractable = true;
+                    roleOptionSettingOption.CountPlusBtn.isInteractable = true;
+                    roleOptionSettingOption.transform.GetChild(3).GetComponent<SpriteRenderer>().color = option.BaseRole.Color;
+                    option.Setting = roleOptionSettingOption;
+
+                    tabOptions.Children.Add(optionBehaviour);
+
+                    // Role Setting Button
+                    var newButton = Object.Instantiate(roleOptionSettingOption.buttons[0], roleOptionSettingOption.transform);
+                    newButton.name = "ConfigButton";
+                    newButton.transform.localPosition = new Vector3(0.4473f, -0.3f, -2f);
+                    newButton.transform.FindChild("Text_TMP").gameObject.DestroyImmediate();
+                    newButton.activeSprites.Destroy();
+
+                    // Read Sprite from Mod Resources
+                    var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();
+                    btnRend.sprite = Utility.CreateSprite("TruthAPI.Resources.Cog.png", 100f);
+
+                    var passiveButton = newButton.GetComponent<GameOptionButton>();
+                    passiveButton.OnClick = new ButtonClickedEvent();
+                    passiveButton.interactableColor = btnRend.color = Color.white;
+                    passiveButton.interactableHoveredColor = Palette.CrewmateBlue;
+                    passiveButton.OnClick.AddListener((UnityAction)(() => 
+                    {
+                        __instance.ToggleLeftSideDarkener(on: true);
+                        __instance.ToggleRightSideDarkener(on: false);
+                        var roleTab = Object.Instantiate(__instance.RoleSettingsTab, __instance.transform);
+                        roleTab.gameObject.SetActive(true);
+                        roleTab.transform.GetChild(1).gameObject.SetActive(false);
+                        roleTab.transform.localPosition = new Vector3(1.4873f, -0.653f, -4f);
+                        customRolesSettings = roleTab;
+                        tabOptions.gameObject.SetActive(false);
+                        // Create custom role tab and change to custom role tab
+                        ChangeTab(roleTab, new ModRoleRulesCategory { Role = option.BaseRole, AllGameSettings = option.BaseRole.AdvancedOptions.Values.ToList() }, tabOptions);
+                    }));
+                }
+
+                else if (option.Type == CustomOptionType.Toggle)
+                {
+                    OptionBehaviour optionBehaviour = Object.Instantiate(tabOptions.checkboxOrigin, Vector3.zero,
+                        Quaternion.identity, tabOptions.settingsContainer);
+                    optionBehaviour.transform.localPosition = new Vector3(0.95f, num, -2f);
+                    optionBehaviour.SetClickMask(tabOptions.ButtonClickMask);
+                    SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                    for (var i = 0; i < components.Length; i++)
+                        components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+
+                    var toggleOption = optionBehaviour as ToggleOption;
+                    option.Setting = toggleOption;
+
+                    tabOptions.Children.Add(optionBehaviour);
+                }
+
+                else if (option.Type == CustomOptionType.String)
+                {
+                    var playerCount = GameOptionsManager.Instance.currentNormalGameOptions.MaxPlayers;
+
+                    OptionBehaviour optionBehaviour = Object.Instantiate(tabOptions.stringOptionOrigin,
+                        Vector3.zero, Quaternion.identity, tabOptions.settingsContainer);
+                    optionBehaviour.transform.localPosition = new Vector3(0.95f, num, -2f);
+                    optionBehaviour.SetClickMask(tabOptions.ButtonClickMask);
+                    SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                    for (var i = 0; i < components.Length; i++)
+                        components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+
+                    var stringOption = optionBehaviour as StringOption;
+                    option.Setting = stringOption;
+
+                    tabOptions.Children.Add(optionBehaviour);
+                }
+
+                num -= 0.45f;
+                tabOptions.scrollBar.SetYBoundsMax(-num - 1.65f);
+                option.OptionCreated();
+            }
+
+            for (var i = 0; i < tabOptions.Children.Count; i++)
+            {
+                var optionBehaviour = tabOptions.Children[i];
+                if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost) optionBehaviour.SetAsPlayer();
+            }
+
+            Tabs.Add(tab);
+            tab.SetActive(false);
+        }
+
+        private static void ChangeTab(RolesSettingsMenu __instance, ModRoleRulesCategory cat, GameOptionsMenu tabOptions)
+        {
+            CreateAdvancedSettings(__instance, cat, tabOptions);
+            __instance.roleDescriptionText.text = cat.Role.LongDescription;
+            __instance.roleTitleText.text = cat.Role.Name;
+            __instance.roleScreenshot.sprite = cat.Role.Icon;
+            __instance.roleHeaderSprite.color = cat.Role.Color;
+            __instance.roleHeaderText.color = Color.white;
+            __instance.RoleChancesSettings.SetActive(false);
+            __instance.AdvancedRolesSettings.SetActive(true);
+            __instance.RefreshChildren();
+            ControllerManager.Instance.CurrentUiState.SelectableUiElements = __instance.ControllerSelectable;
+        }
+
+        private static void CreateAdvancedSettings(RolesSettingsMenu __instance, ModRoleRulesCategory cat, GameOptionsMenu tabOptions)
+        {
+            float num = -0.872f;
+            foreach (CustomOption allGameSetting in cat.AllGameSettings)
+            {
+                switch (allGameSetting.Type)
+                {
+                    case CustomOptionType.Number:
+                        {
+                            OptionBehaviour optionBehaviour = Object.Instantiate(__instance.numberOptionOrigin, Vector3.zero, Quaternion.identity, __instance.AdvancedRolesSettings.transform);
+                            optionBehaviour.transform.localPosition = new Vector3(2.17f, num, -2f);
+                            optionBehaviour.SetClickMask(__instance.ButtonClickMask);
+                            optionBehaviour.LabelBackground.enabled = false;
+                            SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                            for (var i = 0; i < components.Length; i++)
+                                components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+                            optionBehaviour.AssociatedRole = cat.Role.RoleBehaviour.Role;
+
+                            var numberOption = optionBehaviour as NumberOption;
+                            numberOption.MinusBtn.enabled = true;
+                            numberOption.PlusBtn.enabled = true;
+                            allGameSetting.Setting = numberOption;
+
+                            tabOptions.Children.Add(optionBehaviour);
+                            break;
+                        }
+                    case CustomOptionType.Toggle:
+                        {
+                            OptionBehaviour optionBehaviour = Object.Instantiate(tabOptions.checkboxOrigin, Vector3.zero, Quaternion.identity, __instance.AdvancedRolesSettings.transform);
+                            optionBehaviour.transform.localPosition = new Vector3(2.17f, num, -2f);
+                            optionBehaviour.SetClickMask(__instance.ButtonClickMask);
+                            optionBehaviour.LabelBackground.enabled = false;
+                            SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                            for (var i = 0; i < components.Length; i++)
+                                components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+                            optionBehaviour.AssociatedRole = cat.Role.RoleBehaviour.Role;
+
+                            var toggleOption = optionBehaviour as ToggleOption;
+                            allGameSetting.Setting = toggleOption;
+
+                            tabOptions.Children.Add(optionBehaviour);
+                            break;
+                        }
+                    case CustomOptionType.String:
+                        {
+                            var playerCount = GameOptionsManager.Instance.currentNormalGameOptions.MaxPlayers;
+
+                            OptionBehaviour optionBehaviour = Object.Instantiate(tabOptions.stringOptionOrigin, Vector3.zero, Quaternion.identity, __instance.AdvancedRolesSettings.transform);
+                            optionBehaviour.transform.localPosition = new Vector3(2.17f, num, -2f);
+                            optionBehaviour.SetClickMask(__instance.ButtonClickMask);
+                            optionBehaviour.LabelBackground.enabled = false;
+                            SpriteRenderer[] components = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
+                            for (var i = 0; i < components.Length; i++)
+                                components[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+                            optionBehaviour.AssociatedRole = cat.Role.RoleBehaviour.Role;
+
+                            var stringOption = optionBehaviour as StringOption;
+                            allGameSetting.Setting = stringOption;
+
+                            tabOptions.Children.Add(optionBehaviour);
+                            break;
+                        }
+                }
+                num -= 0.45f;
+                __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+                allGameSetting.OptionCreated();
+            }
+            __instance.scrollBar.CalculateAndSetYBounds(cat.AllGameSettings.Count + 3, 1f, 6f, 0.45f);
+            __instance.scrollBar.ScrollToTop();
+        }
+
+        public struct ModRoleRulesCategory
+        {
+            public BaseRole Role;
+
+            public List<CustomOption> AllGameSettings;
+        }
+    }
+
+    [HarmonyPatch(typeof(LobbyViewSettingsPane), nameof(LobbyViewSettingsPane.SetTab))]
+    private class SetTabPane
+    {
+        public static bool Prefix(LobbyViewSettingsPane __instance)
+        {
+            if ((int)__instance.currentTab < 6)
+            {
+                ChangeTabPane.Postfix(__instance, __instance.currentTab);
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(LobbyViewSettingsPane), nameof(LobbyViewSettingsPane.ChangeTab))]
+    private class ChangeTabPane
+    {
+        public static void Postfix(LobbyViewSettingsPane __instance, StringNames category)
+        {
+            var tab = (int)category;
+
+            foreach (var button in SettingsAwake.Buttons) button.SelectButton(false);
+            if (tab > 5) return;
+            __instance.taskTabButton.SelectButton(false);
+
+            if (tab > 0)
+            {
+                tab -= 1;
+                SettingsAwake.Buttons[tab].SelectButton(true);
+                SettingsAwake.AddSettings(__instance, SettingsAwake.ButtonTypes[tab]);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(LobbyViewSettingsPane), nameof(LobbyViewSettingsPane.Update))]
+    private class UpdatePane
+    {
+        public static void Postfix(LobbyViewSettingsPane __instance)
+        {
+            if (SettingsAwake.Buttons.Count == 0) SettingsAwake.Postfix(__instance);
+        }
+    }
+
+    [HarmonyPatch(typeof(LobbyViewSettingsPane), nameof(LobbyViewSettingsPane.Awake))]
+    private class SettingsAwake
+    {
+        public static readonly List<PassiveButton> Buttons = new();
+        public static readonly List<MultiMenu> ButtonTypes = new();
+
+        public static void Postfix(LobbyViewSettingsPane __instance)
+        {
+            Buttons.ForEach(x => x?.Destroy());
+            Buttons.Clear();
+            ButtonTypes.Clear();
+
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
+
+            GameObject.Find("RolesTabs")?.Destroy();
+            var overview = GameObject.Find("OverviewTab");
+            overview.transform.localScale = new Vector3(0.73f, 1f, 1f);
+            overview.transform.localPosition += new Vector3(-0.8f, 0f, 0f);
+            overview.transform.GetChild(0).GetChild(0).transform.localScale += new Vector3(0.35f, 0f, 0f);
+            overview.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(-1f, 0f, 0f);
+
+            CreateButton(__instance, 1, "ModTab", "Mod Settings", MultiMenu.Main, overview);
+            CreateButton(__instance, 2, "CrewmateTab", "Crewmate Settings", MultiMenu.Crewmate, overview);
+            CreateButton(__instance, 3, "NeutralTab", "Neutral Settings", MultiMenu.Neutral, overview);
+            CreateButton(__instance, 4, "ImpostorTab", "Impostor Settings", MultiMenu.Impostor, overview);
+        }
+
+        public static void CreateButton(LobbyViewSettingsPane __instance, int target, string name, string text,
+            MultiMenu menu, GameObject overview)
+        {
+            var tab = GameObject.Find(name);
+            if (tab == null)
+            {
+                tab = GameObject.Instantiate(overview, overview.transform.parent);
+                tab.transform.localPosition += new Vector3(2.5f, 0f, 0f) * target;
+                tab.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(-0.5f, 0f, 0f);
+                tab.name = name;
+                __instance.StartCoroutine(Effects.Lerp(1f,
+                    new Action<float>(p =>
+                    {
+                        tab.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text =
+                            text;
+                    })));
+                var pTab = tab.GetComponent<PassiveButton>();
+                pTab.OnClick.RemoveAllListeners();
+                pTab.OnClick.AddListener((Action)(() => { __instance.ChangeTab((StringNames)target); }));
+                pTab.SelectButton(false);
+                Buttons.Add(pTab);
+                ButtonTypes.Add(menu);
+            }
+        }
+
+        public static void AddSettings(LobbyViewSettingsPane __instance, MultiMenu menu)
+        {
+            var options = CustomOption.AllOptions.Where(x => x.Menu == menu).ToList();
+
+            var num = 1.3f;
+            var headingCount = 0;
+            var settingsThisHeader = 0;
+            var settingRowCount = 0;
+
+            for (int j = 0; j < __instance.settingsInfo.Count; j++)
+            {
+                __instance.settingsInfo[j].gameObject.Destroy();
+            }
+
+            __instance.settingsInfo.Clear();
+
+            foreach (var option in options)
+                if (option.Type == CustomOptionType.Header)
+                {
+                    if (settingsThisHeader % 2 != 0) num -= 0.85f;
+                    var header = Object.Instantiate(__instance.categoryHeaderOrigin);
+                    header.SetHeader(StringNames.ImpostorsCategory, 61);
+                    header.Title.text = option.GetName();
+                    header.transform.SetParent(__instance.settingsContainer);
+                    header.transform.localScale = Vector3.one;
+                    header.transform.localPosition = new Vector3(-9.8f, num, -2f);
+                    __instance.settingsInfo.Add(header.gameObject);
+                    num -= 1f;
+                    headingCount += 1;
+                    settingsThisHeader = 0;
+                }
+                else
+                {
+                    var playerCount = GameOptionsManager.Instance.currentNormalGameOptions.MaxPlayers;
+
+                    if (option.Type == CustomOptionType.Role)
+                    {
+                        if (settingsThisHeader % 2 != 0) num -= 0.85f;
+                        var panel = Object.Instantiate(__instance.infoPanelRoleOrigin);
+                        panel.transform.SetParent(__instance.settingsContainer);
+                        panel.transform.localScale = Vector3.one;
+                        panel.transform.localPosition = new Vector3(-6.76f, num, -2f);
+                        panel.SetInfo(option.BaseRole.Name, (int)option.ValueObject2, (int)option.ValueObject, 61, option.BaseRole.Color, RoleManager.Instance.AllRoles[8].RoleIconSolid, option.BaseRole.Team == Roles.Team.Crewmate);
+                        __instance.settingsInfo.Add(panel.gameObject);
+                        num -= 0.75f;
+                        headingCount += 1;
+                        settingsThisHeader = 0;
+                    }
+                    else
+                    {
+                        var panel = Object.Instantiate(__instance.infoPanelOrigin);
+                        panel.transform.SetParent(__instance.settingsContainer);
+                        panel.transform.localScale = Vector3.one;
+                        if (settingsThisHeader % 2 != 0)
+                        {
+                            panel.transform.localPosition = new Vector3(-3f, num, -2f);
+                            num -= 0.85f;
+                        }
+                        else
+                        {
+                            settingRowCount += 1;
+                            panel.transform.localPosition = new Vector3(-8.9f, num, -2f);
+                        }
+
+                        settingsThisHeader += 1;
+                        panel.SetInfo(StringNames.ImpostorsCategory, option.ToString(), 61);
+                        panel.titleText.text = option.GetName();
+                        __instance.settingsInfo.Add(panel.gameObject);
+                    }
+                }
+
+            float actual_spacing = (headingCount * 1.05f + settingRowCount * 0.85f) / (headingCount + settingRowCount) * 1.01f;
+            __instance.scrollBar.CalculateAndSetYBounds(__instance.settingsInfo.Count + (headingCount + settingRowCount) * 2 + headingCount, 2f, 6f, actual_spacing);
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoSpawnPlayer))]
+    private class PlayerJoinPatch
+    {
+        public static void Postfix(PlayerPhysics __instance)
+        {
+            if (PlayerControl.AllPlayerControls.Count < 2 || !AmongUsClient.Instance ||
+                !PlayerControl.LocalPlayer || !AmongUsClient.Instance.AmHost) return;
+
+            Coroutines.Start(RpcUpdateSetting.SendRpc(RecipientId: __instance.myPlayer.OwnerId));
+        }
+    }
+
+
+    [HarmonyPatch(typeof(ToggleOption), nameof(ToggleOption.Toggle))]
+    private class ToggleButtonPatch
+    {
+        public static bool Prefix(ToggleOption __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomToggleOption toggle)
+            {
+                toggle.Toggle();
+                return false;
+            }
+
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek ||
+                __instance.boolOptionName == BoolOptionNames.VisualTasks ||
+                __instance.boolOptionName == BoolOptionNames.AnonymousVotes ||
+                __instance.boolOptionName == BoolOptionNames.ConfirmImpostor) return true;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(RoleOptionSetting), nameof(RoleOptionSetting.IncreaseChance))]
+    private class RoleOptionSettingPatchIncreaseChance
+    {
+        public static bool Prefix(RoleOptionSetting __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomRoleOption roleOption)
+            {
+                roleOption.IncreaseChance();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(RoleOptionSetting), nameof(RoleOptionSetting.DecreaseChance))]
+    private class RoleOptionSettingPatchDecreaseChance
+    {
+        public static bool Prefix(RoleOptionSetting __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomRoleOption roleOption)
+            {
+                roleOption.DecreaseChance();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(RoleOptionSetting), nameof(RoleOptionSetting.IncreaseCount))]
+    private class RoleOptionSettingPatchIncreaseCount
+    {
+        public static bool Prefix(RoleOptionSetting __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomRoleOption roleOption)
+            {
+                roleOption.IncreaseCount();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(RoleOptionSetting), nameof(RoleOptionSetting.DecreaseCount))]
+    private class RoleOptionSettingPatchDecreaseCount
+    {
+        public static bool Prefix(RoleOptionSetting __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomRoleOption roleOption)
+            {
+                roleOption.DecreaseCount();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(NumberOption), nameof(NumberOption.Initialize))]
+    private class NumberOptionInitialise
+    {
+        public static bool Prefix(NumberOption __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance);
+            if (option is CustomNumberOption number)
+            {
+                __instance.MinusBtn.isInteractable = true;
+                __instance.PlusBtn.isInteractable = true;
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(NumberOption), nameof(NumberOption.Increase))]
+    private class NumberOptionPatchIncrease
+    {
+        public static bool Prefix(NumberOption __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomNumberOption number)
+            {
+                number.Increase();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(NumberOption), nameof(NumberOption.Decrease))]
+    private class NumberOptionPatchDecrease
+    {
+        public static bool Prefix(NumberOption __instance)
+        {
+            var option =
+                CustomOption.AllOptions.FirstOrDefault(option =>
+                    option.Setting == __instance); // Works but may need to change to gameObject.name check
+            if (option is CustomNumberOption number)
+            {
+                number.Decrease();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(StringOption), nameof(StringOption.Increase))]
+    private class StringOptionPatchIncrease
+    {
+        public static bool Prefix(StringOption __instance)
+        {
+            var option = CustomOption.AllOptions.FirstOrDefault(option => option.Setting == __instance);
+            if (option is CustomStringOption str)
+            {
+                str.Increase();
+
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(StringOption), nameof(StringOption.Decrease))]
+    private class StringOptionPatchDecrease
+    {
+        public static bool Prefix(StringOption __instance)
+        {
+            var option = CustomOption.AllOptions.FirstOrDefault(option => option.Setting == __instance);
+            if (option is CustomStringOption str)
+            {
+                str.Decrease();
+
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(NotificationPopper), nameof(NotificationPopper.AddRoleSettingsChangeMessage))]
+    public static class NotificationPopperPatch
+    {
+        [HarmonyPrefix]
+        public static bool RoleChangeMsgPatch(
+            NotificationPopper __instance,
+            [HarmonyArgument(0)] StringNames key,
+            [HarmonyArgument(1)] int roleCount,
+            [HarmonyArgument(2)] int roleChance,
+            [HarmonyArgument(3)] RoleTeamTypes teamType,
+            [HarmonyArgument(4)] bool playSound)
+        {
+            var item = TranslationController.Instance.GetString(
+                StringNames.LobbyChangeSettingNotificationRole,
+                string.Concat(
+                    "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">",
+                    Palette.CrewmateSettingChangeText.ToTextColor(),
+                    TranslationController.Instance.GetString(key),
+                    "</color></font>"
+                ),
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + roleCount + "</font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + roleChance + "%"
+            );
+
+            __instance.SettingsChangeMessageLogic(key, item, playSound);
+            return false;
+        }
+    }
+}

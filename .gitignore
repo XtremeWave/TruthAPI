@@ -1,0 +1,8 @@
+# Visual Studio 的临时文件和目录
+.vs/
+
+# 编译临时文件、发布配置文件、开发配置
+TruthAPI/obj/
+
+# 解决方案
+/TruthAPI.sln

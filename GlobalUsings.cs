@@ -1,0 +1,11 @@
+global using HarmonyLib;
+global using System.Collections.Generic;
+global using System.IO;
+global using System.Linq;
+global using System.Net.Http;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using System.Reflection;
+global using UnityEngine;
+global using TruthAPI.Helpers;
+global using static TruthAPI.Modules.Log.XtremeLogger;

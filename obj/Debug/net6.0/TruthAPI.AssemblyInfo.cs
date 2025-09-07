@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("The API for Fractured")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0-release+38c9e00976bbb9ea5693392a76640b96be342c70")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0-release+d927fcc75c2f1021b29c413d28c6a24eb519f9a1")]
 [assembly: System.Reflection.AssemblyProductAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

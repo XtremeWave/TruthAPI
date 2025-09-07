@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\WindowsFile\\TruthAPI\\TruthAPI.csproj": {}
+    "E:\\WindowsFile\\FracturedTruth_Dev with API\\TruthAPI\\TruthAPI.csproj": {}
   },
   "projects": {
-    "E:\\WindowsFile\\TruthAPI\\TruthAPI.csproj": {
+    "E:\\WindowsFile\\FracturedTruth_Dev with API\\TruthAPI\\TruthAPI.csproj": {
       "version": "1.0.0-release",
       "restore": {
-        "projectUniqueName": "E:\\WindowsFile\\TruthAPI\\TruthAPI.csproj",
+        "projectUniqueName": "E:\\WindowsFile\\FracturedTruth_Dev with API\\TruthAPI\\TruthAPI.csproj",
         "projectName": "TruthAPI",
-        "projectPath": "E:\\WindowsFile\\TruthAPI\\TruthAPI.csproj",
+        "projectPath": "E:\\WindowsFile\\FracturedTruth_Dev with API\\TruthAPI\\TruthAPI.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "E:\\WindowsFile\\TruthAPI\\obj\\",
+        "outputPath": "E:\\WindowsFile\\FracturedTruth_Dev with API\\TruthAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

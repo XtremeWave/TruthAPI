@@ -13,6 +13,7 @@ namespace TruthAPI.Patches.Role
         [HarmonyPrefix]
         private static void OnRevivePatch(PlayerControl __instance)
         {
+            player.SetKillCooldown();
             ModRoleManager.Roles.Do(r => r.OnRevive(__instance));
         }
     }

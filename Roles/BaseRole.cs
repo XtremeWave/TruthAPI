@@ -124,7 +124,11 @@ namespace TruthAPI.Roles
         {
             return false;
         }
-        
+        /// <summary>
+        /// 是否可以召开紧急会议
+        /// </summary>
+        public virtual bool CanCallEmergency { get; } = false;
+
         /// <summary>
         /// If a player should be able to see a person with this role.
         /// Only works with Visibility.Custom

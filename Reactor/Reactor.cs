@@ -55,7 +55,33 @@ public static class Reactor
 		rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
 	}
 }
+public static class RandomExtensions
+{
+    public static double NextDouble(this System.Random random, double minValue, double maxValue)
+    {
+        return random.NextDouble() * (maxValue - minValue) + minValue;
+    }
+    public static T? Random<T>(this IEnumerable<T> input)
+    {
+        IList<T> list = (input as IList<T>) ?? input.ToList();
+        if (list.Count != 0)
+        {
+            return list[UnityEngine.Random.Range(0, list.Count)];
+        }
 
+        return default(T);
+    }
+    public static T? Random<T>(this IEnumerable<T> input, System.Random random)
+    {
+        IList<T> list = (input as IList<T>) ?? input.ToList();
+        if (list.Count != 0)
+        {
+            return list[random.Next(0, list.Count)];
+        }
+
+        return default(T);
+    }
+}
 public static class Coroutines
 {
 	[RegisterInIl2Cpp]

@@ -8,6 +8,7 @@ using InnerNet;
 using TruthAPI.Components;
 using TruthAPI.GameModes;
 using TruthAPI.Managers;
+using TruthAPI.Modules;
 using TruthAPI.Options;
 using UnityEngine;
 using Random = System.Random;
@@ -30,13 +31,14 @@ namespace TruthAPI
         public static readonly Random Random = new Random();
         public static IEnumerable<PlayerControl> AllPlayerControls =>
     PlayerControl.AllPlayerControls.ToArray().Where(p => p);
+        public static Dictionary<byte, float> AllPlayerKillCooldown = new();
         public static ConfigFile ConfigFile { get; private set; }
         public static ManualLogSource Logger;
 
         public override void Load()
         {
             ConfigFile = Config;
-
+            ModTranslation.Load();
             RegisterCustomRoleAttribute.Load();
             RegisterCustomGameModeAttribute.Load();
 

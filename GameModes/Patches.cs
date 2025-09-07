@@ -79,10 +79,10 @@ namespace TruthAPI.GameModes
             }
         }
         
-        [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
+        [HarmonyPatch(typeof(ModRoleManager), nameof(ModRoleManager.SelectRoles))]
         [HarmonyPriority(Priority.Last)]
         [HarmonyPostfix]
-        public static void AssignRolesPatch(RoleManager __instance)
+        public static void AssignRolesPatch(ModRoleManager __instance)
         {
             foreach (var mode in GameModeManager.Modes)
             {

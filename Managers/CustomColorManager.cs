@@ -3,8 +3,6 @@ using System.Linq;
 using AmongUs.Data.Legacy;
 using BepInEx.Configuration;
 using HarmonyLib;
-using Reactor.Localization.Utilities;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

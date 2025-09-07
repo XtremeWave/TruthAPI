@@ -2,7 +2,7 @@ using System;
 
 namespace TruthAPI.Modules.Log.LogHandler;
 
-internal class LogHandler(string tag) : ILogHandler
+public class LogHandler(string tag) : ILogHandler
 {
     public string Tag { get; } = tag;
 

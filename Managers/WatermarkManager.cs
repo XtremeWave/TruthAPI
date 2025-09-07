@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using HarmonyLib;
 using InnerNet;
-using Reactor.Patches;
 using TMPro;
 using UnityEngine;
 
@@ -12,12 +11,12 @@ namespace TruthAPI.Managers
         public class Watermark
         {
             /// <summary>
-            /// Text that gets added to the version text
+            /// VersionShower文本
             /// </summary>
             public string VersionText { get; set; }
 
             /// <summary>
-            /// Text that gets added to the ping text
+            /// PingTrancker文本
             /// </summary>
             public string PingText { get; set; }
 
@@ -30,51 +29,14 @@ namespace TruthAPI.Managers
 
         private static List<Watermark> Watermarks = new List<Watermark>();
 
-        public static Watermark PeasApiWatermark = new Watermark($"<color=#ff0000ff>TruthAPI {TruthAPI.Version} <color=#ffffffff> by <color=#ff0000ff>Peasplayer", 
-            "\n<color=#ff0000ff>TruthAPI");
+        public static Watermark ApiWatermark = new Watermark($"<color=#00168A>TruthAPI <color=#A20004> {TruthAPI.Version} <color=#ffffffff> by <color=#cdfffd>XtremeWave",
+            $"\n{ColorHelper.GradientColorText("00168A", "A20004","TruthAPI")}");
 
         public static void AddWatermark(string versionText, string pingText)
         {
             var watermark = new Watermark(versionText, pingText);
             Watermarks.Add(watermark);
         }
-
-        static bool haveStart = false;
-
-        [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
-        public static class MainMenuManagerStartPatch
-        {
-            static void Postfix(MainMenuManager __instance)
-            {
-                if (!haveStart)
-                {
-                    haveStart = true;
-
-                    foreach (var watermark in Watermarks)
-                    {
-                        if (watermark.VersionText != null)
-                        {
-                            ReactorVersionShower.TextUpdated += text =>
-                            {
-                                text.text += "\n" + watermark.VersionText;
-                            };
-                        }
-                    }
-
-                    if (TruthAPI.ShamelessPlug)
-                    {
-                        if (PeasApiWatermark.VersionText != null)
-                        {
-                            ReactorVersionShower.TextUpdated += text =>
-                            {
-                                text.text += "\n" + PeasApiWatermark.VersionText;
-                            };
-                        }
-                    }
-                }
-            }
-        }
-        
         [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
         public static class PingTrackerUpdatePatch
         {
@@ -99,11 +61,8 @@ namespace TruthAPI.Managers
                         __instance.text.text += watermark.PingText;
                 }
 
-                if (TruthAPI.ShamelessPlug)
-                {
-                    if (PeasApiWatermark.PingText != null)
-                        __instance.text.text += PeasApiWatermark.PingText;
-                }
+                if (ApiWatermark.PingText != null)
+                    __instance.text.text += ApiWatermark.PingText;
             }
         }
     }

@@ -29,8 +29,7 @@ namespace TruthAPI.Components
                             $"Type {type.FullDescription()} must extend {nameof(BaseRole)}.");
                     }
 
-                    if (TruthAPI.Logging)
-                        TruthAPI.Logger.LogInfo($"Registered role {type.Name} from {type.Assembly.GetName().Name}");
+                    Info($"Registered role {type.Name} from {type.Assembly.GetName().Name}", "Registered Role");
 
                     Activator.CreateInstance(type, plugin);
                 }

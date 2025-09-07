@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace TruthAPI.Roles
 {
-    public static class RoleManager
+    public static class ModRoleManager
     {
-        public static List<byte> Crewmates => Utility.GetAllPlayers().Where(p => !p.Data.Role.IsImpostor).ToList().ConvertAll(p => p.PlayerId);
+        public static List<byte> Crewmates => GetAllPlayers().Where(p => !p.Data.Role.IsImpostor).ToList().ConvertAll(p => p.PlayerId);
 
-        public static List<byte> Impostors => Utility.GetAllPlayers().Where(p => p.Data.Role.IsImpostor).ToList().ConvertAll(p => p.PlayerId);
+        public static List<byte> Impostors => GetAllPlayers().Where(p => p.Data.Role.IsImpostor).ToList().ConvertAll(p => p.PlayerId);
 
         public static List<BaseRole> Roles = new List<BaseRole>();
 
@@ -46,10 +46,9 @@ namespace TruthAPI.Roles
             
             role.TeamType = baseRole.Team switch
             {
-                Team.Alone => (RoleTeamTypes) 3,
-                Team.Role => (RoleTeamTypes) 3,
-                Team.Crewmate => RoleTeamTypes.Crewmate,
-                Team.Impostor => RoleTeamTypes.Impostor,
+                TeamTypes.Neutral => (RoleTeamTypes) 3,
+                TeamTypes.Crewmate => RoleTeamTypes.Crewmate,
+                TeamTypes.Impostor => RoleTeamTypes.Impostor,
                 _ => RoleTeamTypes.Crewmate
             };
             role.MaxCount = baseRole.MaxCount;

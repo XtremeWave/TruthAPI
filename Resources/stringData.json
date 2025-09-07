@@ -1,0 +1,30 @@
+{
+    "ImpostorSettings": {
+        "0": "Impostor Roles",
+        "13": "伪装者设置"
+    },
+    "CrewmateSettings": {
+        "0": "Crewamte Roles",
+        "13": "船员设置"
+    },
+    "NeutralSettings": {
+        "0": "Neutral Roles",
+        "13": "中立设置"
+    },
+    "SubRoleSettings": {
+        "0": "SubRole Roles",
+        "13": "副职业设置"
+    },
+    "AddonSettings": {
+        "0": "Addon Roles",
+        "13": "附加效果设置"
+    },
+    "ModSettings": {
+        "0": "Mod Settings",
+        "13": "模组设置"
+    },
+    "SpecialSettings": {
+        "0": "Special Settings",
+        "13": "特性设置"
+    }
+}

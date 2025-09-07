@@ -1,178 +1,18 @@
 using System;
 using AmongUs.GameOptions;
-using FracturedTruth.DataHandling.Options;
-using FracturedTruth.Helpers;
-using FracturedTruth.Roles.Core;
-using static FracturedTruth.Helpers.ColorHelper;
+using TruthAPI.Options;
+using TruthAPI.Helpers;
+using TruthAPI.Roles;
+using TruthAPI.Extension.PlayerControlExtension;
+using static TruthAPI.XtremeGameData.XtremeGameData;
+using static TruthAPI.Helpers.ColorHelper;
 using static Rewired.Utils.Classes.Utility.ObjectInstanceTracker;
 using static UnityEngine.ParticleSystem.PlaybackState;
 
-namespace FracturedTruth.Helpers;
+namespace TruthAPI.Helpers;
 
 public static class RoleHelper
 {
-    #region 主职业
-
-    public static bool IsMainImpostor(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 0 and < 500;
-    }
-
-    public static bool IsMainCrewmate(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 500 and < 1000;
-    }
-
-    // 分不分邪恶中立和友善中立你们决定即可
-    public static bool IsMainNeutral(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 1000 and < 1500;
-    }
-
-    public static FracturedRoleTeamTypes GetMainRoleType(this FracturedRoles role)
-    {
-        if (role.IsMainImpostor()) return FracturedRoleTeamTypes.Impostor;
-        if (role.IsMainCrewmate()) return FracturedRoleTeamTypes.Crewmate;
-        if (role.IsMainNeutral()) return FracturedRoleTeamTypes.Neutral;
-        return FracturedRoleTeamTypes.Invalid;
-    }
-
-    public static bool IsMainRole(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 0 and < 1500;
-    }
-
-    #endregion
-
-    #region 副职业
-
-    public static bool IsSubCommon(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 1500 and < 2000;
-    }
-
-    public static bool IsSubImpostor(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 2000 and < 2500;
-    }
-
-    public static bool IsSubCrewmate(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 2500 and < 3000;
-    }
-
-    public static bool IsSubNeutral(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 3000 and < 3500;
-    }
-
-    public static FracturedRoleTeamTypes GetSubRoleType(this FracturedRoles role)
-    {
-        if (role.IsSubCommon()) return FracturedRoleTeamTypes.Common;
-        if (role.IsSubImpostor()) return FracturedRoleTeamTypes.Impostor;
-        if (role.IsSubCrewmate()) return FracturedRoleTeamTypes.Crewmate;
-        if (role.IsSubNeutral()) return FracturedRoleTeamTypes.Neutral;
-        return FracturedRoleTeamTypes.Invalid;
-    }
-    public static bool IsSubRole(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 1500 and < 3500;
-    }
-    #endregion
-
-    #region 附加效果
-
-    public static bool IsModiCommon(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 3500 and < 4000;
-    }
-
-    public static bool IsModiImpostor(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 4000 and < 4500;
-    }
-
-    public static bool IsModiCrewmate(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 4500 and < 5000;
-    }
-
-    public static bool IsModiNeutral(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 5000 and < 5500;
-    }
-
-    public static FracturedRoleTeamTypes GetModiRoleType(this FracturedRoles role)
-    {
-        if (role.IsModiCommon()) return FracturedRoleTeamTypes.Common;
-        if (role.IsModiImpostor()) return FracturedRoleTeamTypes.Impostor;
-        if (role.IsModiCrewmate()) return FracturedRoleTeamTypes.Crewmate;
-        if (role.IsModiNeutral()) return FracturedRoleTeamTypes.Neutral;
-        return FracturedRoleTeamTypes.Invalid;
-    }
-    public static bool IsModiRole(this FracturedRoles role)
-    {
-        var roleId = (int)role;
-        return roleId is >= 3500 and < 5500;
-    }
-
-    #endregion
-
-    #region 对枚举本身的简单操作
-    public static Dictionary<RoleTypes, string> VRoleColors;
-    public static Dictionary<FracturedRoles, Color> FTRoleColors;
-    public static void MemonyStorage()
-    {
-        FTRoleColors = new Dictionary<FracturedRoles, Color>
-        {
-            { FracturedRoles.Crewmate, Palette.CrewmateBlue},
-            { FracturedRoles.Impostor, Palette.ImpostorRed},
-            { FracturedRoles.Sheriff, new Color32(248, 205, 70, byte.MaxValue)},
-
-        };
-        VRoleColors = new Dictionary<RoleTypes, string>
-        {
-             { RoleTypes.CrewmateGhost,"#8CFFFF"},
-             { RoleTypes.GuardianAngel, "#8CFFDB" },
-             { RoleTypes.Crewmate, "#8CFFFF" },
-             { RoleTypes.Scientist, "#8FF8C" },
-             { RoleTypes.Engineer, "#A5A8FF" },
-             { RoleTypes.Noisemaker, "#FFC08C" },
-             { RoleTypes.Tracker, "#93FF8C" },
-             { RoleTypes.ImpostorGhost, "#FF1919" },
-             { RoleTypes.Impostor, "#FF1919" },
-             { RoleTypes.Shapeshifter, "#FF819E" },
-             { RoleTypes.Phantom, "#CA8AFF" }
-        };
-    }
-    public static string GetName(FracturedRoles fracturedRoles)
-    {
-        return fracturedRoles.ToString();
-    }
-    public static string GetOptionName(FracturedRoles fracturedRoles)
-    {
-        return $"Role.{fracturedRoles.ToString()}";
-    }
-    public static Color GetColor(FracturedRoles fracturedRoles)
-    {
-        MemonyStorage();
-        FTRoleColors.TryGetValue(fracturedRoles, out var color);
-        return color;
-    }
-    #endregion
 
     #region 职业管理
     /// <summary>
@@ -389,18 +229,18 @@ public static class RoleHelper
         {
             switch (role.Team)
             {
-                case FracturedRoleTeamTypes.Invalid:
+                case TeamTypes.Invalid:
                     return false;
-                case FracturedRoleTeamTypes.Role:
+                case TeamTypes.Role:
                     return role.Id == otherRole.Id;
-                case FracturedRoleTeamTypes.Crewmate:
+                case TeamTypes.Crewmate:
                     if (otherRole != null)
-                        return otherRole.Team == FracturedRoleTeamTypes.Crewmate;
+                        return otherRole.Team == TeamTypes.Crewmate;
                     else
                         return !otherPlayer.Data.Role.IsImpostor;
-                case FracturedRoleTeamTypes.Impostor:
+                case TeamTypes.Impostor:
                     if (otherRole != null)
-                        return otherRole.Team == FracturedRoleTeamTypes.Impostor;
+                        return otherRole.Team == TeamTypes.Impostor;
                     else
                         return otherPlayer.Data.Role.IsImpostor;
             }
@@ -413,13 +253,13 @@ public static class RoleHelper
         {
             switch (otherRole.Team)
             {
-                case FracturedRoleTeamTypes.Invalid:
+                case TeamTypes.Invalid:
                     return false;
-                case FracturedRoleTeamTypes.Role:
+                case TeamTypes.Role:
                     return false;
-                case FracturedRoleTeamTypes.Crewmate:
+                case TeamTypes.Crewmate:
                     return !otherPlayer.Data.Role.IsImpostor;
-                case FracturedRoleTeamTypes.Impostor:
+                case TeamTypes.Impostor:
                     return otherPlayer.Data.Role.IsImpostor;
             }
         }
@@ -480,86 +320,20 @@ public static class RoleHelper
         return vector;
     }
     #endregion
-#endregion 
+
+    #region OutGame
+    public static bool IsHost(this PlayerControl player)
+    {
+        try
+        {
+            return AmongUsClient.Instance.GetHost().Id == player.GetClient().Id;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    #endregion
+
+    #endregion
 }
-# region 这里面是一堆枚举
-/// <summary>
-/// 主职业
-/// </summary>
-
-public enum FracturedRoleTeamTypes
-{
-    Invalid = -1,
-    Common,
-    Crewmate,
-    Impostor,
-    Neutral,
-    Role,
-    MainRole,
-    SubRole,
-    Addon
-}
-public enum FracturedRoleMoreTeamTypes
-{
-    Invalid = -1,
-    Common,
-    Crewmate,
-    Impostor,
-    Neutral,
-    MainRole,
-    SubRole,
-    Addon,
-    Jester,
-}
-public enum FracturedRoles
-{
-    NotAssigned = -1,
-
-    // 伪装者 - 主职业
-    Impostor = 0,
-    ImpostorGhost,
-    Shapeshifter,
-    Phantom,
-    //模组职业
-
-    // 船员 - 主职业
-    Crewmate = 500,
-    CrewmateGhost,
-    GuardianAngel,
-    Engineer,
-    Scientist,
-    Tracker,
-    Noisemaker,
-    //模组职业
-    Sheriff,
-
-
-    // 中立 - 主职业
-    Jackal = 1000,
-    Jester,
-
-    // 共生 - 副职业
-    Guesser = 1500,
-
-    // 伪装者 - 副职业
-    Mastermind = 2000, //幕后主使
-
-    // 船员 - 副职业
-    // 暂时没有 = 2500,
-
-    // 中立 - 副职业
-    Drillmaster = 3000, // 演习者
-
-    // 共生 - 附加职业
-    NeverExisted = 3500, // 从未存在
-
-    // 伪装者 - 附加职业
-    DeathArtist = 4000, // 死亡艺术家
-
-    // 船员 - 附加职业
-    // 暂时没有 = 4500,
-
-    // 中立 - 附加职业
-    Unifier = 5000, // 联合者
-}
-#endregion 

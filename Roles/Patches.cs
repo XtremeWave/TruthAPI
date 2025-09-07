@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using AmongUs.GameOptions;
 using HarmonyLib;
-using Il2CppSystem.Collections.Generic;
 using TruthAPI.CustomButtons;
 using TruthAPI.CustomRpc;
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace TruthAPI.Roles
         [HarmonyPrefix]
         public static void OnGameEndPatch(AmongUsClient __instance)
         {
-            RoleManager.Roles.Do(r => r.OnGameStop());
+            ModRoleManager.Roles.Do(r => r.OnGameStop());
         }
         
         [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
@@ -45,7 +44,7 @@ namespace TruthAPI.Roles
                 int index = HashRandom.FastNext(roleList.Count);
                 RoleTypes roleType = roleList.ToArray()[index];
                 roleList.RemoveAt(index);
-                int index2 = global::RoleManager.IsImpostorRole(roleType) && RoleManager.HostMod.IsImpostor
+                int index2 = global::RoleManager.IsImpostorRole(roleType) && ModRoleManager.HostMod.IsImpostor
                     ? 0
                     : HashRandom.FastNext(players.Count);
                 players.ToArray()[index2].Object.RpcSetRole(roleType);
@@ -56,39 +55,9 @@ namespace TruthAPI.Roles
             return false;
         }
 
-        [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
-        [HarmonyPostfix]
-        public static void RoleTextPatch(IntroCutscene._ShowRole_d__41 __instance)
-        {
-            if (PlayerControl.LocalPlayer.GetCustomRole() != null)
-            {
-                var role = PlayerControl.LocalPlayer.GetCustomRole();
-                var scene = __instance.__4__this;
 
-                scene.RoleText.text = role.Name;
-                scene.RoleBlurbText.text = role.Description;
-                scene.RoleText.color = role.Color;
-                scene.RoleBlurbText.color = role.Color;
-            }
-        }
 
-        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginImpostor))]
-        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginCrewmate))]
-        [HarmonyPostfix]
-        public static void TeamTextPatch(IntroCutscene __instance)
-        {
-            if (PlayerControl.LocalPlayer.GetCustomRole() != null)
-            {
-                var role = PlayerControl.LocalPlayer.GetCustomRole();
-                var scene = __instance;
-
-                scene.TeamTitle.text = role.Name;
-                scene.ImpostorText.gameObject.SetActive(true);
-                scene.ImpostorText.text = role.Description;
-                scene.BackgroundBar.material.color = role.Color;
-                scene.TeamTitle.color = role.Color;
-            }
-        }
+       
 
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginImpostor))]
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginCrewmate))]
@@ -99,22 +68,22 @@ namespace TruthAPI.Roles
             if (PlayerControl.LocalPlayer.GetCustomRole() != null)
             {
                 var role = PlayerControl.LocalPlayer.GetCustomRole();
-                if (role.Team == Team.Alone)
+                if (role.Team == TeamTypes.Neutral)
                 {
                     yourTeam = new List<PlayerControl>();
                     yourTeam.Add(PlayerControl.LocalPlayer);
                 }
-                else if (role.Team == Team.Role)
-                {
-                    yourTeam = new List<PlayerControl>();
-                    yourTeam.Add(PlayerControl.LocalPlayer);
-                    foreach (var player in role.Members)
-                    {
-                        if (player != PlayerControl.LocalPlayer.PlayerId)
-                            yourTeam.Add(player.GetPlayer());
-                    }
-                }
-                else if (role.Team == Team.Impostor)
+                //else if (role.Team == TeamTypes.Role)
+                //{
+                //    yourTeam = new List<PlayerControl>();
+                //    yourTeam.Add(PlayerControl.LocalPlayer);
+                //    foreach (var player in role.Members)
+                //    {
+                //        if (player != PlayerControl.LocalPlayer.PlayerId)
+                //            yourTeam.Add(player.GetPlayer());
+                //    }
+                //}
+                else if (role.Team == TeamTypes.Impostor)
                 {
                     yourTeam = new List<PlayerControl>();
                     yourTeam.Add(PlayerControl.LocalPlayer);
@@ -128,26 +97,6 @@ namespace TruthAPI.Roles
             }
         }
 
-        /*[HarmonyPatch(typeof(TranslationController), nameof(TranslationController.GetString), typeof(StringNames),
-            typeof(Il2CppReferenceArray<Object>))]
-        public class TranslationControllerPatch
-        {
-            public static bool Prefix(ref string __result, [HarmonyArgument(0)] StringNames name)
-            {
-                if (ExileController.Instance != null && ExileController.Instance.exiled != null && (name == StringNames.ExileTextPN || name == StringNames.ExileTextSN))
-                {
-                    var role = ExileController.Instance.exiled.Object.GetRole();
-                    if (role != null)
-                    {
-                        var article = role.Members.Count > 1 ? "a" : "the";
-                        __result = $"{ExileController.Instance.exiled.PlayerName} was {article} {role.Name}.";
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }*/
         [HarmonyPatch(typeof(ExileController), nameof(ExileController.BeginForGameplay))]
         [HarmonyPostfix]
         public static void ChangeExileTextPatch(ExileController __instance, [HarmonyArgument(0)] NetworkedPlayerInfo player, [HarmonyArgument(1)] bool voteTie)
@@ -158,7 +107,7 @@ namespace TruthAPI.Roles
             var role = player.Object.GetCustomRole();
             if (role != null)
             {
-                var article = role.Members.Count > 1 ? "a" : "the";
+                var article = role.Members.Count > 1 ? "其中之一的" : "";
                 __instance.completeString = $"{ExileController.Instance.initData.networkedPlayer.PlayerName} was {article} {role.Name}.";
             }
         } 
@@ -168,9 +117,9 @@ namespace TruthAPI.Roles
         {
             public static void Prefix(HudManager __instance)
             {
-                if (PeasAPI.GameStarted)
+                if (XtremeGameData.XtremeGameData.GameStates.GameStarted)
                 {
-                    RoleManager.Roles.Do(r => r._OnUpdate());
+                    ModRoleManager.Roles.Do(r => r._OnUpdate());
                 }
             }
         }
@@ -180,7 +129,7 @@ namespace TruthAPI.Roles
         {
             public static void Postfix(MeetingHud __instance)
             {
-                RoleManager.Roles.Do(r => r._OnMeetingUpdate(__instance));
+                ModRoleManager.Roles.Do(r => r._OnMeetingUpdate(__instance));
             }
         }
 
@@ -189,7 +138,7 @@ namespace TruthAPI.Roles
         {
             public static void Postfix(PlayerControl __instance)
             {
-                if (PeasAPI.GameStarted)
+                if (XtremeGameData.XtremeGameData.GameStates.GameStarted)
                 {
                     var localRole = PlayerControl.LocalPlayer.GetCustomRole();
 
@@ -314,7 +263,7 @@ namespace TruthAPI.Roles
         {
             public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
             {
-                RoleManager.Roles.Do(r => r.OnKill(__instance, target));
+                ModRoleManager.Roles.Do(r => r.OnKill(__instance, target));
             }
         }
 
@@ -322,14 +271,14 @@ namespace TruthAPI.Roles
         [HarmonyPostfix]
         public static void OnPlayerExiledPatch(PlayerControl __instance)
         {
-            RoleManager.Roles.Do(r => r.OnExiled(__instance));
+            ModRoleManager.Roles.Do(r => r.OnExiled(__instance));
         }
 
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.StartMeeting))]
         [HarmonyPrefix]
         public static void OnMeetingStart(MeetingHud __instance)
         {
-            RoleManager.Roles.Do(r => r.OnMeetingStart(__instance));
+            ModRoleManager.Roles.Do(r => r.OnMeetingStart(__instance));
         }
         
         [HarmonyPatch(typeof(PlayerControl._CoSetTasks_d__103), nameof(PlayerControl._CoSetTasks_d__103.MoveNext))]
@@ -375,7 +324,7 @@ namespace TruthAPI.Roles
         {
             public static bool Prefix(SabotageButton __instance)
             {
-                if (__instance.isActiveAndEnabled && PeasAPI.GameStarted)
+                if (__instance.isActiveAndEnabled && XtremeGameData.XtremeGameData.GameStates.GameStarted)
                 {
                     var role = PlayerControl.LocalPlayer.GetCustomRole();
                     if (role == null)
@@ -405,7 +354,7 @@ namespace TruthAPI.Roles
         {
             public static bool Prefix(MapBehaviour __instance)
             {
-                if (PeasAPI.GameStarted)
+                if (XtremeGameData.XtremeGameData.GameStates.GameStarted)
                 {
                     var role = PlayerControl.LocalPlayer.GetCustomRole();
 
@@ -456,7 +405,7 @@ namespace TruthAPI.Roles
         [HarmonyPrefix]
         private static bool ShouldGameEndPatch(GameManager __instance, [HarmonyArgument(0)] GameOverReason endReason)
         {
-            return RoleManager.Roles.Count(r => r.Members.Count != 0 && !r.ShouldGameEnd(endReason)) == 0;
+            return ModRoleManager.Roles.Count(r => r.Members.Count != 0 && !r.ShouldGameEnd(endReason)) == 0;
         }
 
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
@@ -464,28 +413,28 @@ namespace TruthAPI.Roles
         private static void OnTaskCompletePatch(PlayerControl __instance, [HarmonyArgument(0)] uint idx)
         {
             PlayerTask playerTask = __instance.myTasks.ToArray().ToList().Find(p => p.Id == idx);
-            RoleManager.Roles.Do(r => r.OnTaskComplete(__instance, playerTask));
+            ModRoleManager.Roles.Do(r => r.OnTaskComplete(__instance, playerTask));
         }
         
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Revive))]
         [HarmonyPrefix]
         private static void OnRevivePatch(PlayerControl __instance)
         {
-            RoleManager.Roles.Do(r => r.OnRevive(__instance));
+            ModRoleManager.Roles.Do(r => r.OnRevive(__instance));
         }
         
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Exiled))]
         [HarmonyPrefix]
         private static bool PreExiledPatch(PlayerControl __instance)
         {
-            return RoleManager.Roles.Count(r => r.Members.Count != 0 && !r.PreExile(__instance)) == 0;
+            return ModRoleManager.Roles.Count(r => r.Members.Count != 0 && !r.PreExile(__instance)) == 0;
         }
         
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
         [HarmonyPrefix]
         private static bool PreKillPatch(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
         {
-            return RoleManager.Roles.Count(r => r.Members.Count != 0 && !r.PreKill(__instance, target)) == 0;
+            return ModRoleManager.Roles.Count(r => r.Members.Count != 0 && !r.PreKill(__instance, target)) == 0;
         }
         
         [HarmonyPatch(typeof(GameData), nameof(GameData.RecomputeTaskCounts))]

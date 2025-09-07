@@ -8,4 +8,8 @@ global using System.Threading.Tasks;
 global using System.Reflection;
 global using UnityEngine;
 global using TruthAPI.Helpers;
+global using static TruthAPI.Modules.ModTranslation;
+global using static TruthAPI.Utilities.Utils;
+global using static TruthAPI.Helpers.RoleHelper;
+global using static TruthAPI.Enums.RoleTeamEnum;
 global using static TruthAPI.Modules.Log.XtremeLogger;

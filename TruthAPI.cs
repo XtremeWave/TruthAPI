@@ -19,6 +19,7 @@ namespace TruthAPI
     [BepInProcess("Among Us.exe")]
     public class TruthAPI : BasePlugin
     {
+        public const string ModName_EN = "TruthAPI";
         public const string Id = "xtreme.wave.truthapi";
         public const string VersionString = "1.0.0";
 
@@ -27,10 +28,9 @@ namespace TruthAPI
         public static Version Version = Version.Parse(VersionString);
 
         public static readonly Random Random = new Random();
-
+        public static IEnumerable<PlayerControl> AllPlayerControls =>
+    PlayerControl.AllPlayerControls.ToArray().Where(p => p);
         public static ConfigFile ConfigFile { get; private set; }
-
-        public static ManualLogSource Logger { get; private set; }
 
         public static bool Logging
         {
@@ -42,56 +42,16 @@ namespace TruthAPI
             }
         }
 
-        public static bool GameStarted
-        {
-            get
-            {
-                return GameData.Instance && ShipStatus.Instance && AmongUsClient.Instance &&
-                       (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started ||
-                        AmongUsClient.Instance.NetworkMode == global::NetworkModes.FreePlay);
-            }
-        }
-
-        /// <summary>
-        /// If you set this to false please provide credit! I mean this stuff is free and open-source so a little credit would be nice :)
-        /// </summary>
-        public static bool ShamelessPlug = true;
-
-        public static CustomToggleOption ShowRolesOfDead;
-
         public override void Load()
         {
-            Logger = this.Log;
             ConfigFile = Config;
-
-            var useCustomServer = ConfigFile.Bind("CustomServer", "UseCustomServer", false);
-            if (useCustomServer.Value)
-            {
-                CustomServerManager.RegisterServer(ConfigFile.Bind("CustomServer", "Name", "CustomServer").Value,
-                    ConfigFile.Bind("CustomServer", "Ipv4 or Hostname", "au.peasplayer.tk").Value,
-                    ConfigFile.Bind("CustomServer", "Port", (ushort)22023).Value);
-            }
-
-            UpdateManager.RegisterGitHubUpdateListener("fangkuaiclub", "TruthAPI-R");
 
             RegisterCustomRoleAttribute.Load();
             RegisterCustomGameModeAttribute.Load();
 
             new CustomHeaderOption(MultiMenu.Main, "General Settings");
-            ShowRolesOfDead =
-                new CustomToggleOption(MultiMenu.Main, "Show the roles of dead player", false);
-            GameModeManager.GameModeOption = new CustomStringOption(MultiMenu.Main, "GameMode", new string[] { "None" });
 
             Harmony.PatchAll();
-        }
-
-        [HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.Update))]
-        [HarmonyPrefix]
-        public static void PatchToTestSomeStuff(KeyboardJoystick __instance)
-        {
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-            }
         }
     }
 }

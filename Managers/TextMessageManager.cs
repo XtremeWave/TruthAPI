@@ -19,7 +19,7 @@ namespace TruthAPI.Managers
         
         public static void RpcShowMessage(string message, float duration, List<PlayerControl> targets)
         {
-            targets.Do(player => Rpc<RpcShowMessage>.Instance.Send(new RpcShowMessage.Data(message, duration, targets.ConvertAll(_player => _player.PlayerId))));
+            //targets.Do(player => Rpc<RpcShowMessage>.Instance.Send(new RpcShowMessage.Data(message, duration, targets.ConvertAll(_player => _player.PlayerId))));
         }
         
         private static IEnumerator CoShowText(string text, float duration)

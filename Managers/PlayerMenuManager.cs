@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using Reactor.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -59,7 +58,7 @@ namespace TruthAPI.Managers
                     }
                     catch (Exception err)
                     {
-                        TruthAPI.Logger.LogError("There was an error while executing the player menu: " + err);
+                        Error("There was an error while executing the player menu: " + err, "ChooseListener");
                     }
 
                     CloseMenu();
@@ -80,7 +79,7 @@ namespace TruthAPI.Managers
                 }
                 catch (Exception err)
                 {
-                    TruthAPI.Logger.LogError("There was an error while executing the player menu: " + err);
+                    Error("There was an error while executing the player menu: " + err, "ChooseListener");
                 }
 
                 CloseMenu();
@@ -191,7 +190,7 @@ namespace TruthAPI.Managers
                 }
                 if (MeetingHud.Instance && !IsMenuOpen)
                 {
-                    Logger<TruthAPI>.Info("IsMenuOpen: " + IsMenuOpen);
+                    Info("IsMenuOpen: " + IsMenuOpen, "DummyDontVotePatch");
                     if (!__instance.voted)
                     {
                         __instance.voted = true;

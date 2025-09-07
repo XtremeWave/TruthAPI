@@ -9,7 +9,7 @@ using TruthAPI;
 namespace TruthAPI.Modules.Log;
 
 
-internal static class XtremeLogger
+public static class XtremeLogger
 {
     private static bool isEnable;
     private static readonly List<string> disableList = [];

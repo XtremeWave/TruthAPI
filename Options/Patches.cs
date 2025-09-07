@@ -5,13 +5,12 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using TruthAPI.CustomRpc;
 using TruthAPI.Roles;
-using Reactor.Utilities;
-using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using static UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
+using TruthAPI.Utilities;
 
 namespace TruthAPI.Options;
 
@@ -163,10 +162,12 @@ public static class Patches
             settingsButton.transform.localPosition += new Vector3(0f, 2f, 0f);
             settingsButton.transform.localScale *= 0.9f;
 
-            CreateSettings(__instance, 3, "ModSettings", "Mod Settings", settingsButton, MultiMenu.Main);
-            CreateSettings(__instance, 4, "CrewSettings", "Crewmate Settings", settingsButton, MultiMenu.Crewmate);
-            CreateSettings(__instance, 5, "NeutralSettings", "Neutral Settings", settingsButton, MultiMenu.Neutral);
-            CreateSettings(__instance, 6, "ImpSettings", "Impostor Settings", settingsButton, MultiMenu.Impostor);
+            CreateSettings(__instance, 3, "ModSettings", "ModSettings", settingsButton, MultiMenu.Main);
+            CreateSettings(__instance, 4, "CrewmateSettings", "CrewmateSettings", settingsButton, MultiMenu.Crewmate);
+            CreateSettings(__instance, 5, "NeutralSettings", "NeutralSettings", settingsButton, MultiMenu.Neutral);
+            CreateSettings(__instance, 6, "ImpostorSettings", "ImpostorSettings", settingsButton, MultiMenu.Impostor);
+            CreateSettings(__instance, 6, "SubRoleSettings", "SubRoleSettings", settingsButton, MultiMenu.Impostor);
+            CreateSettings(__instance, 6, "AddonSettings", "AddonSettings", settingsButton, MultiMenu.Impostor);
         }
 
         internal static RolesSettingsMenu customRolesSettings = null;
@@ -184,7 +185,7 @@ public static class Patches
                     new Action<float>(p =>
                     {
                         button.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text =
-                            text;
+                            GetString(text);
                     })));
                 var passiveButton = button.GetComponent<PassiveButton>();
                 passiveButton.OnClick.RemoveAllListeners();
@@ -285,7 +286,7 @@ public static class Patches
 
                     // Read Sprite from Mod Resources
                     var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();
-                    btnRend.sprite = Utility.CreateSprite("TruthAPI.Resources.Cog.png", 100f);
+                    btnRend.sprite = Utils.loadSpriteFromResources("TruthAPI.Resources.Cog.png", 100f);
 
                     var passiveButton = newButton.GetComponent<GameOptionButton>();
                     passiveButton.OnClick = new ButtonClickedEvent();
@@ -513,10 +514,12 @@ public static class Patches
             overview.transform.GetChild(0).GetChild(0).transform.localScale += new Vector3(0.35f, 0f, 0f);
             overview.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(-1f, 0f, 0f);
 
-            CreateButton(__instance, 1, "ModTab", "Mod Settings", MultiMenu.Main, overview);
-            CreateButton(__instance, 2, "CrewmateTab", "Crewmate Settings", MultiMenu.Crewmate, overview);
-            CreateButton(__instance, 3, "NeutralTab", "Neutral Settings", MultiMenu.Neutral, overview);
-            CreateButton(__instance, 4, "ImpostorTab", "Impostor Settings", MultiMenu.Impostor, overview);
+            CreateButton(__instance, 1, "ModTab", "ModSettings", MultiMenu.Main, overview);
+            CreateButton(__instance, 2, "CrewmateTab", "CrewmateSettings", MultiMenu.Crewmate, overview);
+            CreateButton(__instance, 3, "NeutralTab", "NeutralSettings", MultiMenu.Neutral, overview);
+            CreateButton(__instance, 4, "ImpostorTab", "ImpostorSettings", MultiMenu.Impostor, overview);
+            CreateButton(__instance, 5, "SubRoleTab", "SubRoleSettings", MultiMenu.Impostor, overview);
+            CreateButton(__instance, 6, "AddonTab", "AddonSettings", MultiMenu.Impostor, overview);
         }
 
         public static void CreateButton(LobbyViewSettingsPane __instance, int target, string name, string text,
@@ -533,7 +536,7 @@ public static class Patches
                     new Action<float>(p =>
                     {
                         tab.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text =
-                            text;
+                            GetString(text);
                     })));
                 var pTab = tab.GetComponent<PassiveButton>();
                 pTab.OnClick.RemoveAllListeners();
@@ -586,7 +589,7 @@ public static class Patches
                         panel.transform.SetParent(__instance.settingsContainer);
                         panel.transform.localScale = Vector3.one;
                         panel.transform.localPosition = new Vector3(-6.76f, num, -2f);
-                        panel.SetInfo(option.BaseRole.Name, (int)option.ValueObject2, (int)option.ValueObject, 61, option.BaseRole.Color, RoleManager.Instance.AllRoles[8].RoleIconSolid, option.BaseRole.Team == Roles.Team.Crewmate);
+                        panel.SetInfo(option.BaseRole.Name, (int)option.ValueObject2, (int)option.ValueObject, 61, option.BaseRole.Color, RoleManager.Instance.AllRoles[8].RoleIconSolid, option.BaseRole.Team == TeamTypes.Crewmate);
                         __instance.settingsInfo.Add(panel.gameObject);
                         num -= 0.75f;
                         headingCount += 1;

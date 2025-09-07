@@ -26,10 +26,9 @@ namespace TruthAPI.Components
                     {
                         throw new InvalidOperationException($"Type {type.FullDescription()} must extend {nameof(GameMode)}.");
                     }
-                    
-                    if (PeasAPI.Logging)
-                        PeasAPI.Logger.LogInfo($"Registered mode {type.Name} from {type.Assembly.GetName().Name}");
-                    
+
+                    Info($"Registered mode {type.Name} from {type.Assembly.GetName().Name}", "Registered GameMode");
+
                     Activator.CreateInstance(type, plugin);
                 }
             }

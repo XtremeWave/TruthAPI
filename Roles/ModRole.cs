@@ -1,6 +1,5 @@
 ﻿using Il2CppSystem.Text;
 using TruthAPI;
-using Reactor.Utilities.Attributes;
 
 namespace TruthAPI.Roles;
 

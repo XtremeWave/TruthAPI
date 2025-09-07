@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <Folder Include="CustomButtons\" />
-    <Folder Include="Enums\" />
+    <Folder Include="Skills\" />
   </ItemGroup>
 
 </Project>

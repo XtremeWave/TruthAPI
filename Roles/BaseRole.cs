@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Unity.IL2CPP;
+using TruthAPI.Enum;
 using TruthAPI.Managers;
 using TruthAPI.Options;
+using TruthAPI.Utilities;
 using UnityEngine;
+using static TruthAPI.Enum.Visibility;
+using static UnityEngine.ProBuilder.AutoUnwrapSettings;
 
 namespace TruthAPI.Roles
 {
@@ -34,7 +38,7 @@ namespace TruthAPI.Roles
         /// <summary>
         /// Used to display images in role settings
         /// </summary>
-        public virtual Sprite Icon { get; } = Utility.CreateSprite("PeasAPI.Resources.Placeholder.png");
+        public virtual Sprite Icon { get; } = loadSpriteFromResources("PeasAPI.Resources.Placeholder.png",115f);
         
         /// <summary>
         /// The description of the Role at the task list
@@ -47,6 +51,10 @@ namespace TruthAPI.Roles
         public abstract Color Color { get; }
 
         /// <summary>
+        /// 职业的技能，详情在另一个Base
+        /// </summary>
+        //public abstract  Skill { get; }
+        /// <summary>
         /// Who can see the identity of the player with the Role
         /// </summary>
         public abstract Visibility Visibility { get; }
@@ -54,7 +62,7 @@ namespace TruthAPI.Roles
         /// <summary>
         /// Who the player with the Role is in a team
         /// </summary>
-        public abstract Team Team { get; }
+        public abstract TeamTypes Team { get; }
 
         /// <summary>
         /// Whether the player should get tasks
@@ -118,7 +126,7 @@ namespace TruthAPI.Roles
             if (playerWithRole.PlayerId == perspective.PlayerId)
                 return true;
 
-            if (playerWithRole.Data.IsDead && PeasAPI.ShowRolesOfDead.Value)
+            if (playerWithRole.Data.IsDead)
                 return true;
             
             switch (this.Visibility)
@@ -259,11 +267,11 @@ namespace TruthAPI.Roles
 
         public BaseRole(BasePlugin plugin)
         {
-            Id = RoleManager.GetRoleId();
-            RoleBehaviour = RoleManager.ToRoleBehaviour(this);
+            Id = ModRoleManager.GetRoleId();
+            RoleBehaviour = ModRoleManager.ToRoleBehaviour(this);
             if (CreateRoleOption)
                 Option = new CustomRoleOption(this, AdvancedOptionsPrefix, AdvancedOptions.Values.ToArray());
-            RoleManager.RegisterRole(this);
+            ModRoleManager.RegisterRole(this);
         }
     }
 }

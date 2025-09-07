@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TruthAPI.Roles;
-using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements.UIR;
 using static UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
+using TruthAPI.Utilities;
 
 namespace TruthAPI.Options;
 
@@ -17,9 +17,9 @@ public class CustomRoleOption : CustomOption
 {
     internal CustomOption[] AdvancedOptions;
 
-    public CustomRoleOption(BaseRole baseRole, string prefix, CustomOption[] advancedOptions, MultiMenu menu = MultiMenu.NULL) : base(num++,
+    public CustomRoleOption(BaseRole baseRole, string prefix, CustomOption[] advancedOptions, MultiMenu menu = MultiMenu.Null) : base(num++,
         menu == MultiMenu.Null ? GetMultiMenu(baseRole) : menu,
-        Utility.ColorString(baseRole.Color, baseRole.Name), CustomOptionType.Role, baseRole.Chance, baseRole.Count, baseRole: baseRole)
+        ColorHelper.SetStringColor(baseRole.Color, baseRole.Name), CustomOptionType.Role, baseRole.Chance, baseRole.Count, baseRole: baseRole)
     {
         List<CustomOption> removedOptions = new List<CustomOption>();
         if (advancedOptions != null)
@@ -56,14 +56,16 @@ public class CustomRoleOption : CustomOption
     {
         switch (baseRole.Team)
         {
-            case Team.Role:
+            case TeamTypes.Neutral:
                 return MultiMenu.Neutral;
-            case Team.Alone:
-                return MultiMenu.Neutral;
-            case Team.Crewmate:
+            case TeamTypes.Crewmate:
                 return MultiMenu.Crewmate;
-            case Team.Impostor:
+            case TeamTypes.Impostor:
                 return MultiMenu.Impostor;
+            case TeamTypes.SubRole:
+                return MultiMenu.SubRole;
+            case TeamTypes.Addon:
+                return MultiMenu.Addon;
             default:
                 return MultiMenu.Main;
         }

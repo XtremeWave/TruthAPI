@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7fa07f8d105077a303a74bfcbb76274d923a47f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+91cd64e4ee391b4ceb9d54a36ab3bceaf267fe3a")]
 [assembly: System.Reflection.AssemblyProductAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -8,6 +8,43 @@ namespace TruthAPI.Patches.Role
 {
     public static class AssignedRole
     {
+        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginImpostor))]
+        [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginCrewmate))]
+        [HarmonyPrefix]
+        public static void RoleTeamPatch(IntroCutscene __instance,
+            [HarmonyArgument(0)] ref List<PlayerControl> yourTeam)
+        {
+            if (PlayerControl.LocalPlayer.GetCustomRole() != null)
+            {
+                var role = PlayerControl.LocalPlayer.GetCustomRole();
+                if (role.Team == TeamTypes.Neutral)
+                {
+                    yourTeam = new List<PlayerControl>();
+                    yourTeam.Add(PlayerControl.LocalPlayer);
+                }
+                //else if (role.Team == TeamTypes.Role)
+                //{
+                //    yourTeam = new List<PlayerControl>();
+                //    yourTeam.Add(PlayerControl.LocalPlayer);
+                //    foreach (var player in role.Members)
+                //    {
+                //        if (player != PlayerControl.LocalPlayer.PlayerId)
+                //            yourTeam.Add(player.GetPlayer());
+                //    }
+                //}
+                else if (role.Team == TeamTypes.Impostor)
+                {
+                    yourTeam = new List<PlayerControl>();
+                    yourTeam.Add(PlayerControl.LocalPlayer);
+                    foreach (var player in role.Members)
+                    {
+                        if (player != PlayerControl.LocalPlayer.PlayerId &&
+                            player.GetPlayer().Data.Role.IsImpostor)
+                            yourTeam.Add(player.GetPlayer());
+                    }
+                }
+            }
+        }
         [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
         [HarmonyPostfix]
         public static void RoleTextPatch(IntroCutscene._ShowRole_d__41 __instance)

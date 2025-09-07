@@ -21,32 +21,32 @@ namespace TruthAPI.Roles
         public RoleBehaviour RoleBehaviour;
 
         /// <summary>
-        /// The name of the Role. Will displayed at the intro, ejection and task list
+        /// 职业名称
         /// </summary>
         public abstract string Name { get; }
 
         /// <summary>
-        /// The description of the Role. Will displayed at the intro
+        /// 职业介绍
         /// </summary>
         public abstract string Description { get; }
 
         /// <summary>
-        /// More detailed role description, show in role settings
+        /// 职业详细介绍
         /// </summary>
         public abstract string LongDescription { get; }
 
         /// <summary>
-        /// Used to display images in role settings
+        /// 职业图标
         /// </summary>
         public virtual Sprite Icon { get; } = loadSpriteFromResources("PeasAPI.Resources.Placeholder.png",115f);
         
         /// <summary>
-        /// The description of the Role at the task list
+        /// 任务栏介绍
         /// </summary>
         public abstract string TaskText { get; }
 
         /// <summary>
-        /// The color of the Role. Will displayed at the intro, name, task list, game end
+        /// 职业名称，Outro的颜色
         /// </summary>
         public abstract Color Color { get; }
 
@@ -55,40 +55,53 @@ namespace TruthAPI.Roles
         /// </summary>
         //public abstract  Skill { get; }
         /// <summary>
-        /// Who can see the identity of the player with the Role
+        /// 字面意思
         /// </summary>
         public abstract Visibility Visibility { get; }
 
         /// <summary>
-        /// Who the player with the Role is in a team
+        /// 职业阵营
         /// </summary>
         public abstract TeamTypes Team { get; }
 
         /// <summary>
-        /// Whether the player should get tasks
+        /// 注册的任务
         /// </summary>
         public virtual bool AssignTasks { get; set; } = true;
-        
+        /// <summary>
+        /// 决定你是否有活可以干的喵
+        /// </summary>
         public abstract bool HasToDoTasks { get; }
 
         /// <summary>
-        /// How many player should get the Role
+        /// 应该出现此职业的概率
         /// </summary>
         public virtual int Chance { get; set; } = 0;
-
+        /// <summary>
+        /// 出现多少个此职业
+        /// </summary>
         public virtual int Count { get; set; } = 0;
+        /// <summary>
+        /// 最大出现多少个此职业
+        /// </summary>
         public virtual int MaxCount { get; set; } = 15;
         
         public virtual bool CreateRoleOption { get; set; } = true;
-
+        /// <summary>
+        /// 该角色的固定生成设置
+        /// </summary>
         public CustomRoleOption Option;
         
         public virtual Dictionary<string, CustomOption> AdvancedOptions { get; set; } = new Dictionary<string, CustomOption>();
 
         public virtual string AdvancedOptionsPrefix { get; set; } = "└ ";
-
+        /// <summary>
+        /// 游戏模式白名单（雾
+        /// </summary>
         public virtual Type[] GameModeWhitelist { get; } = Array.Empty<Type>();
-
+        /// <summary>
+        /// 击杀距离
+        /// </summary>
         public virtual float KillDistance { get; set; } = Mathf.Clamp(GameManager.Instance?.LogicOptions?.GetKillDistance() ?? 1.8f, 0, 2);
 
         /// <summary>

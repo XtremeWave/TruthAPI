@@ -2,8 +2,8 @@
 using System.Linq;
 using AmongUs.GameOptions;
 using HarmonyLib;
-using Reactor.Localization.Utilities;
 using UnityEngine;
+using static TruthAPI.XtremeGameData.XtremeGameData.GameStates;
 
 namespace TruthAPI.GameModes
 {
@@ -45,7 +45,7 @@ namespace TruthAPI.GameModes
             {
                 foreach (var mode in GameModeManager.Modes)
                 {
-                    if (mode.Enabled && PlayerControl.LocalPlayer && TruthAPI.GameStarted)
+                    if (mode.Enabled && PlayerControl.LocalPlayer && GameStarted)
                         mode.OnUpdate();
                 }
             }
@@ -79,10 +79,10 @@ namespace TruthAPI.GameModes
             }
         }
         
-        [HarmonyPatch(typeof(ModRoleManager), nameof(ModRoleManager.SelectRoles))]
+        [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
         [HarmonyPriority(Priority.Last)]
         [HarmonyPostfix]
-        public static void AssignRolesPatch(ModRoleManager __instance)
+        public static void AssignRolesPatch(RoleManager __instance)
         {
             foreach (var mode in GameModeManager.Modes)
             {
@@ -119,7 +119,7 @@ namespace TruthAPI.GameModes
         {
             public static bool Prefix(SabotageButton __instance)
             {
-                if (__instance.isActiveAndEnabled && TruthAPI.GameStarted)
+                if (__instance.isActiveAndEnabled && GameStarted)
                 {
                     foreach (var mode in GameModeManager.Modes)
                     {
@@ -151,7 +151,7 @@ namespace TruthAPI.GameModes
         {
             public static void Prefix(MapBehaviour __instance)
             {
-                if (TruthAPI.GameStarted)
+                if (GameStarted)
                 {
                     foreach (var mode in GameModeManager.Modes)
                     {

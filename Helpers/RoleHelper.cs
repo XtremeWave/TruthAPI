@@ -5,13 +5,13 @@ using TruthAPI.Helpers;
 using TruthAPI.Roles;
 using TruthAPI.Extension.PlayerControlExtension;
 using static TruthAPI.XtremeGameData.XtremeGameData;
-using static TruthAPI.Helpers.ColorHelper;
+using static TruthAPI.Helpers.APIColorHelper;
 using static Rewired.Utils.Classes.Utility.ObjectInstanceTracker;
 using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace TruthAPI.Helpers;
 
-public static class RoleHelper
+public static class APIRoleHelper
 {
 
     #region 职业管理
@@ -318,20 +318,6 @@ public static class RoleHelper
         var vector = new Vector3(currentPosition.x, currentPosition.y, z);
         transform.position = vector;
         return vector;
-    }
-    #endregion
-
-    #region OutGame
-    public static bool IsHost(this PlayerControl player)
-    {
-        try
-        {
-            return AmongUsClient.Instance.GetHost().Id == player.GetClient().Id;
-        }
-        catch
-        {
-            return false;
-        }
     }
     #endregion
 

@@ -2,7 +2,7 @@
 
 namespace TruthAPI.Helpers;
 
-public static class ColorHelper
+public static class APIColorHelper
 {
     private const float MarkerSat = 1f;
     private const float MarkerVal = 1f;

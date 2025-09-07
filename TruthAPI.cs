@@ -31,16 +31,7 @@ namespace TruthAPI
         public static IEnumerable<PlayerControl> AllPlayerControls =>
     PlayerControl.AllPlayerControls.ToArray().Where(p => p);
         public static ConfigFile ConfigFile { get; private set; }
-
-        public static bool Logging
-        {
-            get
-            {
-                if (ConfigFile == null)
-                    return true;
-                return ConfigFile.Bind("Settings", "Logging", true).Value;
-            }
-        }
+        public static ManualLogSource Logger;
 
         public override void Load()
         {

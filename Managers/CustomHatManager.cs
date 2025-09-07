@@ -19,8 +19,6 @@ public static class CustomHatManager
     internal static readonly Dictionary<string, HatViewData> ViewDataCache = new();
     internal static readonly List<CustomHat> RegisteredHats = new();
 
-    private static ManualLogSource Log => PluginSingleton<TruthAPI>.Instance.Log;
-
     internal static void LoadHatsRoutine()
     {
         if (LoadedHats || !DestroyableSingleton<HatManager>.InstanceExists ||
@@ -57,7 +55,7 @@ public static class CustomHatManager
         }
         catch (Exception e)
         {
-            Log.LogError($"Error while loading hats: {e.Message}\nStack: {e.StackTrace}");
+            Error($"Error while loading hats: {e.Message}\nStack: {e.StackTrace}", "LoadHats");
         }
 
         yield return null;
@@ -101,7 +99,7 @@ public static class CustomHatManager
             }
             else
             {
-                Log.LogError($"Failed to load hat image: {customHat.Image}");
+                Error($"Failed to load hat image: {customHat.Image}", "GenerateHatBehaviour");
                 return null;
             }
         }

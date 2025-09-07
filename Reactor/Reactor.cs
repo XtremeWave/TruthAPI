@@ -15,7 +15,31 @@ namespace TruthAPI.Reactor;
 
 public static class Reactor
 {
-	public static void Destroy(this UnityEngine.Object obj)
+    public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> collection)
+    {
+        return collection.SelectMany(x => x);
+    }
+
+    /// <summary>
+    ///     销毁对象的<see cref="TextTranslatorTMP" />组件
+    /// </summary>
+    public static void DestroyTranslator(this GameObject obj)
+    {
+        if (!obj) return;
+        obj.ForEachChild((Action<GameObject>)(x => DestroyTranslator(x)));
+        TextTranslatorTMP[] translator = obj.GetComponentsInChildren<TextTranslatorTMP>(true);
+        translator?.Do(UnityEngine.Object.Destroy);
+    }
+
+    /// <summary>
+    ///     销毁对象的 <see cref="TextTranslatorTMP" /> 组件
+    /// </summary>
+    public static void DestroyTranslator(this MonoBehaviour obj)
+    {
+        obj?.gameObject.DestroyTranslator();
+    }
+
+    public static void Destroy(this UnityEngine.Object obj)
 	{
 		UnityEngine.Object.Destroy(obj);
 	}
@@ -35,9 +59,9 @@ public static class Reactor
 public static class Coroutines
 {
 	[RegisterInIl2Cpp]
-	internal class Component : MonoBehaviour
+	public class Component : MonoBehaviour
 	{
-		internal static Component Instance { get; set; }
+        public static Component Instance { get; set; }
 
 		public Component(IntPtr ptr) : base(ptr)
 		{

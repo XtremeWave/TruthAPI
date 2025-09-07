@@ -7,7 +7,7 @@ using TruthAPI.Roles;
 
 namespace TruthAPI.Patches.Role
 {
-    public static class Vent
+    public static class VentEvent
     {
         [HarmonyPatch(typeof(Vent), nameof(Vent.CanUse))]
         [HarmonyPriority(Priority.First)]

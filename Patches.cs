@@ -3,7 +3,7 @@
 namespace TruthAPI
 {
     [HarmonyPatch]
-    public static class Patches
+    public static class PatchesMain
     {
         /*[HarmonyPatch(typeof(VersionShower), nameof(VersionShower.Start))]
         [HarmonyPostfix]

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "++qZGEUB+Ng=",
+  "dgSpecHash": "DWSE+ZOSF1c=",
   "success": true,
   "projectFilePath": "E:\\WindowsFile\\TruthAPI\\TruthAPI.csproj",
   "expectedPackageFiles": [
@@ -14,7 +14,7 @@
     "C:\\Users\\ASUS\\.nuget\\packages\\assetripper.primitives\\3.1.3\\assetripper.primitives.3.1.3.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\bepinex.autoplugin\\1.1.0\\bepinex.autoplugin.1.1.0.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\bepinex.core\\6.0.0-be.735\\bepinex.core.6.0.0-be.735.nupkg.sha512",
-    "C:\\Users\\ASUS\\.nuget\\packages\\bepinex.il2cpp.msbuild\\2.1.0-rc.1\\bepinex.il2cpp.msbuild.2.1.0-rc.1.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\bepinex.il2cpp.msbuild\\2.0.1\\bepinex.il2cpp.msbuild.2.0.1.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\bepinex.unity.common\\6.0.0-be.735\\bepinex.unity.common.6.0.0-be.735.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\bepinex.unity.il2cpp\\6.0.0-be.735\\bepinex.unity.il2cpp.6.0.0-be.735.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\disarm\\2022.1.0-master.57\\disarm.2022.1.0-master.57.nupkg.sha512",
@@ -91,7 +91,10 @@
     "C:\\Users\\ASUS\\.nuget\\packages\\system.security.cryptography.x509certificates\\4.3.0\\system.security.cryptography.x509certificates.4.3.0.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\system.threading\\4.3.0\\system.threading.4.3.0.nupkg.sha512",
-    "C:\\Users\\ASUS\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512"
+    "C:\\Users\\ASUS\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
   ],
   "logs": []
 }

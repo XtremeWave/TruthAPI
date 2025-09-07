@@ -1,0 +1,6 @@
+E:\WindowsFile\TruthAPI\obj\Debug\net6.0\TruthAPI.csproj.AssemblyReference.cache
+E:\WindowsFile\TruthAPI\obj\Debug\net6.0\TruthAPI.GeneratedMSBuildEditorConfig.editorconfig
+E:\WindowsFile\TruthAPI\obj\Debug\net6.0\TruthAPI.AssemblyInfoInputs.cache
+E:\WindowsFile\TruthAPI\obj\Debug\net6.0\TruthAPI.AssemblyInfo.cs
+E:\WindowsFile\TruthAPI\obj\Debug\net6.0\TruthAPI.csproj.CoreCompileInputs.cache
+E:\WindowsFile\TruthAPI\obj\Debug\net6.0\TruthAPI.sourcelink.json

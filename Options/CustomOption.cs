@@ -137,12 +137,12 @@ public class CustomOption
             if (configChanged)
             {
                 TruthAPI.ConfigFile.Save();
-                TruthAPI.Logger.LogInfo("Settings have been saved to the BepInEx configuration file");
+                Info("Settings have been saved to the BepInEx configuration file", "SaveOption");
             }
         }
         catch (Exception ex)
         {
-            TruthAPI.Logger.LogError($"Error occurred while saving settings: {ex.Message}");
+            Error($"Error occurred while saving settings: {ex.Message}", "SaveOption");
         }
     }
 
@@ -190,15 +190,15 @@ public class CustomOption
                 }
                 catch (Exception ex)
                 {
-                    TruthAPI.Logger.LogWarning($"Error occurred while loading option {option.Name}: {ex.Message}");
+                    Warn($"Error occurred while loading option {option.Name}: {ex.Message}", "LoadSettings");
                 }
             }
 
-            TruthAPI.Logger.LogInfo("Settings have been loaded from the BepInEx configuration file");
+            Info("Settings have been loaded from the BepInEx configuration file", "LoadSettings");
         }
         catch (Exception ex)
         {
-            TruthAPI.Logger.LogError($"Error occurred while loading settings: {ex.Message}");
+            Error($"Error occurred while loading settings: {ex.Message}", "LoadSettings");
         }
         finally
         {

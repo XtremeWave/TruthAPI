@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using LogLevel = BepInEx.Logging.LogLevel;
-using TruthAPI;
+using TruthAPI.Patches.Vanilla;
 
 namespace TruthAPI.Modules.Log;
 

@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("TruthAPI")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("XtremeWave")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("The API for Fractured")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f93b310dc8f1e1c638241d31c970aa3fa7d07d69")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0-release+f93b310dc8f1e1c638241d31c970aa3fa7d07d69")]
 [assembly: System.Reflection.AssemblyProductAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TruthAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

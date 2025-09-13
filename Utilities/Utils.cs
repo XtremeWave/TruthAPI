@@ -5,11 +5,16 @@ using System.Text;
 using AmongUs.GameOptions;
 using TruthAPI.Helpers;
 using TruthAPI.Extension.PlayerControlExtension;
-using static TruthAPI.XtremeGameData.XtremeGameData.GameStates;
+using static TruthAPI.XtremeGameData.APIXtremeGameData.GameStates;
 using Il2CppInterop.Runtime.InteropTypes;
 using InnerNet;
 using UnityEngine;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using FracturedTruth.DataHandling;
+using Rewired.Utils.Classes;
+using Rewired.Utils.Platforms.Windows;
+using static TruthAPI.XtremeGameData.APIXtremeGameData;
+using TruthAPI.XtremeGameData;
 
 namespace TruthAPI.Utilities;
 
@@ -120,10 +125,11 @@ public static class Utils
     #region Sprite
 
     public static Dictionary<string, Sprite> CachedSprites = new();
-    public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit, bool cache = true)
+    public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit,bool FTPath = true,bool cache = true)
     {
         try
         {
+            if (FTPath) path = "FracturedTruth.Resources." + path;
             if (cache && CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
             Texture2D texture = loadTextureFromResources(path);
             sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
@@ -163,4 +169,14 @@ public static class Utils
 
     #endregion
 
+    #region Game Play
+    public static bool IsGhost(RoleTypes role)
+    {
+        return role switch
+        {
+            RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel => true,
+            _ => false
+        };
+    }
+    #endregion
 }

@@ -286,7 +286,7 @@ public static class Patches
 
                     // Read Sprite from Mod Resources
                     var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();
-                    btnRend.sprite = Utils.loadSpriteFromResources("TruthAPI.Resources.Cog.png", 100f);
+                    btnRend.sprite = Utils.loadSpriteFromResources("TruthAPI.Resources.Cog.png", 100f,false);
 
                     var passiveButton = newButton.GetComponent<GameOptionButton>();
                     passiveButton.OnClick = new ButtonClickedEvent();

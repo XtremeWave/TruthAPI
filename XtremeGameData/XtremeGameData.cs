@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TruthAPI.XtremeGameData;
 
-public static partial class XtremeGameData
+public static partial class APIXtremeGameData
 {
     public static string LastResultText;
     public static string LastRoomCode;

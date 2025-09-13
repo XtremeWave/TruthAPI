@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
+using TruthAPI.Extension.PlayerControlExtension;
 
 namespace TruthAPI.Patches.Role
 {
     public static class AssignedRole
     {
+        [HarmonyPatch(nameof(IntroCutscene.CoBegin))]
+        [HarmonyPrefix]
+        public static void CoBegin_Prefix()
+        {
+            Info("Game Start", "IntroCutscene");
+        }
+
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginImpostor))]
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginCrewmate))]
         [HarmonyPrefix]
@@ -22,16 +31,16 @@ namespace TruthAPI.Patches.Role
                     yourTeam = new List<PlayerControl>();
                     yourTeam.Add(PlayerControl.LocalPlayer);
                 }
-                //else if (role.Team == TeamTypes.Role)
-                //{
-                //    yourTeam = new List<PlayerControl>();
-                //    yourTeam.Add(PlayerControl.LocalPlayer);
-                //    foreach (var player in role.Members)
-                //    {
-                //        if (player != PlayerControl.LocalPlayer.PlayerId)
-                //            yourTeam.Add(player.GetPlayer());
-                //    }
-                //}
+                else if (role.Team == TeamTypes.Neutral)
+                {
+                    yourTeam = new List<PlayerControl>();
+                    yourTeam.Add(PlayerControl.LocalPlayer);
+                    foreach (var player in role.Members)
+                    {
+                        if (player != PlayerControl.LocalPlayer.PlayerId)
+                            yourTeam.Add(player.GetPlayer());
+                    }
+                }
                 else if (role.Team == TeamTypes.Impostor)
                 {
                     yourTeam = new List<PlayerControl>();
@@ -58,6 +67,9 @@ namespace TruthAPI.Patches.Role
                 scene.RoleBlurbText.text = role.Description;
                 scene.RoleText.color = role.Color;
                 scene.RoleBlurbText.color = role.Color;
+                scene.RoleText.fontWeight = FontWeight.Thin;
+                scene.RoleText.SetOutlineColor(role.Color.ShadeColor(0.1f).SetAlpha(0.38f));
+                scene.RoleText.SetOutlineThickness(0.17f);
             }
         }
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.BeginImpostor))]

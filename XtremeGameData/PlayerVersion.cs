@@ -2,7 +2,7 @@ using System;
 
 namespace TruthAPI.XtremeGameData;
 
-public static partial class XtremeGameData
+public static partial class APIXtremeGameData
 {
     public class PlayerVersion(Version ver, string tag_str, string forkId)
     {

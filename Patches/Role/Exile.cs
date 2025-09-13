@@ -27,7 +27,7 @@ namespace TruthAPI.Patches.Role
             if (role != null)
             {
                 var article = role.Members.Count > 1 ? "其中之一的" : "";
-                __instance.completeString = $"{ExileController.Instance.initData.networkedPlayer.PlayerName} was {article} {role.Name}.";
+                __instance.completeString = $"{ExileController.Instance.initData.networkedPlayer.PlayerName} 是 {article} {role.Name}.";
             }
         }
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Exiled))]

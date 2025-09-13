@@ -15,6 +15,22 @@ namespace TruthAPI.Reactor;
 
 public static class Reactor
 {
+    public static T? LoadAsset<T>(this AssetBundle bundle, string name) where T : UnityEngine.Object
+    {
+        UnityEngine.Object @object = bundle.LoadAsset(name, Il2CppInterop.Runtime.Il2CppType.Of<T>());
+        if ((object)@object == null)
+        {
+            return null;
+        }
+
+        return @object.Cast<T>();
+    }
+    public static byte[] ReadFully(this System.IO.Stream input)
+    {
+        using System.IO.MemoryStream memoryStream = new System.IO.MemoryStream();
+        input.CopyTo(memoryStream);
+        return memoryStream.ToArray();
+    }
     public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> collection)
     {
         return collection.SelectMany(x => x);

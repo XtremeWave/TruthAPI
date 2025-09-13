@@ -38,7 +38,7 @@ namespace TruthAPI.Roles
         /// <summary>
         /// 职业图标
         /// </summary>
-        public virtual Sprite Icon { get; } = loadSpriteFromResources("PeasAPI.Resources.Placeholder.png",115f);
+        public virtual Sprite Icon { get; } = loadSpriteFromResources("PeasAPI.Resources.Placeholder.png",115f, false);
         
         /// <summary>
         /// 任务栏介绍

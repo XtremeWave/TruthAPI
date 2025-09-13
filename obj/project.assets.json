@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net6.0": {
-      "AmongUs.GameLibs.Steam/2025.4.15": {
+      "AmongUs.GameLibs.Steam/2025.9.9": {
         "type": "package",
         "build": {
           "build/AmongUs.GameLibs.Steam.props": {}
@@ -1439,13 +1439,13 @@
     }
   },
   "libraries": {
-    "AmongUs.GameLibs.Steam/2025.4.15": {
-      "sha512": "R3RxzHGZOGUJ9nMwrP0cjS6g+sh60QUU506Mo47lh17155enUjH6PtErijihSoU7t3aQpzCIyC67W3XrrHhH4g==",
+    "AmongUs.GameLibs.Steam/2025.9.9": {
+      "sha512": "cTDFYQ7awW2pDhqX3ADtQHBTJN3JvuWkOcleQMkdBbNJEVW/kwUu4btdCn6a8hYQXQZ3eocYI/vhwXs3lhiNkA==",
       "type": "package",
-      "path": "amongus.gamelibs.steam/2025.4.15",
+      "path": "amongus.gamelibs.steam/2025.9.9",
       "files": [
         ".nupkg.metadata",
-        "amongus.gamelibs.steam.2025.4.15.nupkg.sha512",
+        "amongus.gamelibs.steam.2025.9.9.nupkg.sha512",
         "amongus.gamelibs.steam.nuspec",
         "build/AddressablesPlayAssetDelivery.dll",
         "build/AmongUs.GameLibs.Steam.props",
@@ -4674,7 +4674,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "AmongUs.GameLibs.Steam >= 2025.4.15",
+      "AmongUs.GameLibs.Steam >= 2025.9.9",
       "BepInEx.AutoPlugin >= 1.1.0",
       "BepInEx.IL2CPP.MSBuild >= 2.0.1",
       "BepInEx.Unity.IL2CPP >= 6.0.0-be.735"
@@ -4736,7 +4736,7 @@
         "dependencies": {
           "AmongUs.GameLibs.Steam": {
             "target": "Package",
-            "version": "[2025.4.15, )"
+            "version": "[2025.9.9, )"
           },
           "BepInEx.AutoPlugin": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",

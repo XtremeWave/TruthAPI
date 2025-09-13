@@ -4,7 +4,7 @@ using InnerNet;
 
 namespace TruthAPI.XtremeGameData;
 
-public partial class XtremeGameData
+public partial class APIXtremeGameData
 {
     public static class GameStates
     {

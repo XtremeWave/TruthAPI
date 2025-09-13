@@ -24,7 +24,7 @@ namespace TruthAPI
         public const string Id = "xtreme.wave.truthapi";
         public const string VersionString = "1.0.0";
 
-        public Harmony Harmony { get; } = new Harmony(Id);
+        static public Harmony Harmony = new Harmony(Id);
 
         public static Version Version = Version.Parse(VersionString);
 

@@ -9,6 +9,8 @@ global using System.Reflection;
 global using UnityEngine;
 global using TruthAPI.Helpers;
 global using TruthAPI.Reactor;
+global using Hazel;
+global using static TruthAPI.Helpers.APIColorHelper;
 global using static TruthAPI.Modules.ModTranslation;
 global using static TruthAPI.Utilities.Utils;
 global using static TruthAPI.Helpers.APIRoleHelper;

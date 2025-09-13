@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "cG5bBGYcmv8=",
+  "dgSpecHash": "fHsrFBfXpew=",
   "success": true,
   "projectFilePath": "E:\\WindowsFile\\FracturedTruth_Dev with API\\TruthAPI\\TruthAPI.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\ASUS\\.nuget\\packages\\amongus.gamelibs.steam\\2025.4.15\\amongus.gamelibs.steam.2025.4.15.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\amongus.gamelibs.steam\\2025.9.9\\amongus.gamelibs.steam.2025.9.9.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\asmresolver\\6.0.0-beta.1\\asmresolver.6.0.0-beta.1.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\asmresolver.dotnet\\6.0.0-beta.1\\asmresolver.dotnet.6.0.0-beta.1.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\asmresolver.pe\\6.0.0-beta.1\\asmresolver.pe.6.0.0-beta.1.nupkg.sha512",
